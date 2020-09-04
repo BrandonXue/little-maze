@@ -12,27 +12,61 @@ function setup() // P5 Setup Fcn
     let sz = g_canvas.cell_size;
     let width = sz * g_canvas.wid;  // Our 'canvas' uses cells of given size, not 1x1 pixels.
     let height = sz * g_canvas.hgt;
-    createCanvas( width, height );  // Make a P5 canvas.
-    draw_grid( 10, 50, 'white', 'yellow' );
+    createCanvas(width, height);  // Make a P5 canvas.
+    draw_grid(10, 50, 'white', 'yellow');
 }
 
-var g_bot = { dir:3, x:20, y:20, color:100 }; // Dir is 0..7 clock, w 0 up.
-var g_box = { t:1, hgt:47, l:1, wid:63 }; // Box in which bot can move.
-
-function move_bot( )
+/** draw_grid: Draw a fancy grid with major & minor lines, and major row/col numbers.
+ *  @param rminor   the number of pixels per minor line
+ *  @param rmajor   the number of pixels per major line
+ *  @param rstroke  the color of the border line
+ *  @param rfill    the fill color of the cell
+ */
+function draw_grid(rminor, rmajor, rstroke, rfill) 
 {
-    let dir = (round (8 * random( ))) // Change direction at random; brownian motion.
+    stroke(rstroke);
+    fill(rfill);;
+    let sz = g_canvas.cell_size;
+    let width = g_canvas.wid*sz;
+    let height = g_canvas.hgt*sz
+    for (var ix = 0; ix < width; ix += rminor)
+    {
+        let big_linep = (ix % rmajor == 0);
+        let line_wgt = 1;
+        if (big_linep) line_wgt = 2;
+        strokeWeight( line_wgt );
+        line( ix, 0, ix, height );
+        strokeWeight( 1 );
+        if (ix % rmajor == 0) {text(ix, ix, 10);}
+    }
+    for (var iy = 0; iy < height; iy += rminor)
+    {
+        let big_linep = (iy % rmajor == 0);
+        let line_wgt = 1;
+        if (big_linep) line_wgt = 2;
+        strokeWeight( line_wgt);
+        line(0, iy, width, iy);
+        strokeWeight(1);
+        if (iy % rmajor == 0) {text( iy, 0, iy + 10 );}
+    }
+}
+
+var g_bot = {dir:3, x:20, y:20, color:100}; // Dir is 0..7 clock, w 0 up.
+var g_box = {t:1, hgt:47, l:1, wid:63}; // Box in which bot can move.
+
+function move_bot(dir)
+{
     let dx = 0;
     let dy = 0;
     switch (dir) { // Convert dir to x,y deltas: dir = clock w 0=Up,2=Rt,4=Dn,6=Left.
-    case 0 : {         dy = -1; break; }
-    case 1 : { dx = 1; dy = -1; break; }
-    case 2 : { dx = 1; break; }
-    case 3 : { dx = 1; dy = 1; break; }
-    case 4 : {         dy = 1; break; }
-    case 5 : { dx = -1; dy = 1; break; }
-    case 6 : { dx = -1; break; }
-    case 7 : { dx = -1; dy = -1; break; }
+        case 0 : {          dy = -1;    break; }
+        case 1 : {dx = 1;   dy = -1;    break; }
+        case 2 : {dx = 1;               break; }
+        case 3 : {dx = 1;   dy = 1;     break; }
+        case 4 : {          dy = 1;     break; }
+        case 5 : {dx = -1;  dy = 1;     break; }
+        case 6 : {dx = -1;              break; }
+        case 7 : {dx = -1;  dy = -1;     break; }
     }
     let x = (dx + g_bot.x + g_box.wid) % g_box.wid; // Move-x.  Ensure positive b4 mod.
     let y = (dy + g_bot.y + g_box.hgt) % g_box.hgt; // Ditto y.
@@ -44,7 +78,7 @@ function move_bot( )
     //console.log( "bot x,y,dir,clr = " + x + "," + y + "," + dir + "," +  color );
 }
 
-function draw_bot( ) // Convert bot pox to grid pos & draw bot.
+function draw_bot() // Convert bot pox to grid pos & draw bot.
 {
     let sz = g_canvas.cell_size;
     let sz2 = sz / 2;
@@ -69,8 +103,9 @@ function draw_bot( ) // Convert bot pox to grid pos & draw bot.
 function draw_update()  // Update our display.
 {
     //console.log( "g_frame_cnt = " + g_frame_cnt );
-    move_bot( );
-    draw_bot( );
+    let dir = (round(8 * random())) // Change direction at random; brownian motion.
+    move_bot(dir);
+    draw_bot();
 }
 
 function draw()  // P5 Frame Re-draw Fcn, Called for Every Frame.
@@ -82,12 +117,12 @@ function draw()  // P5 Frame Re-draw Fcn, Called for Every Frame.
     }
 }
 
-function keyPressed( )
+function keyPressed()
 {
     g_stop = ! g_stop;
 }
 
-function mousePressed( )
+function mousePressed()
 {
     let x = mouseX;
     let y = mouseY;
@@ -104,5 +139,5 @@ function mousePressed( )
     //console.log( "bot y = " + g_bot.y );
     g_bot.y %= g_box.hgt;
     //console.log( "bot x,y = " + g_bot.x + "," + g_bot.y );
-    draw_bot( );
+    draw_bot();
 }
