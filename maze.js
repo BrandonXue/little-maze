@@ -21,6 +21,7 @@ class Maze {
         this.row_count = rows;
         this.col_count = cols;
         this.wall_thickness = w_weight;
+        this.offset = this.wall_thickness * 0.5;
         this.unit_area = unit;
 
         /* The grid is an array of uint arrays. The lowest order 4 bits of the uint array
@@ -48,6 +49,7 @@ class Maze {
             stroke("white");
         else
             stroke("black");
+
         strokeWeight(this.wall_thickness);
 
         // Improper arguments
@@ -58,11 +60,11 @@ class Maze {
 
         let x = right_col * this.unit_area;
         if (val) {
-            line(x, start_row * this.unit_area, // x1, y1
-                 x, (end_row+1) * this.unit_area); // x2, y2
+            line(x + this.offset, (start_row * this.unit_area) + this.offset, // x1, y1
+                 x + this.offset, ((end_row+1) * this.unit_area) + this.offset); // x2, y2
         } else { // Shorten holes slightly
-            line(x, (start_row * this.unit_area) + ceil(0.5 * this.wall_thickness), // x1, y1
-                x, (end_row+1) * this.unit_area) - ceil(0.5 * this.wall_thickness); // x2, y2
+            line(x + this.offset, (start_row * this.unit_area) + (2 * this.offset), // x1, y1
+                 x + this.offset, (end_row+1) * this.unit_area); // x2, y2
         }
     }
 
@@ -146,11 +148,11 @@ class Maze {
 
         let y = bot_row * this.unit_area;
         if (val) {
-            line(start_col * this.unit_area, y, // x1, y1
-                 (end_col+1) * this.unit_area, y); // x2, y2
+            line((start_col * this.unit_area) + this.offset, y + this.offset, // x1, y1
+                 (end_col+1) * this.unit_area + this.offset, y + this.offset); // x2, y2
         } else { // Shorten holes slightly
-            line((start_col * this.unit_area) + ceil(0.5 * this.wall_thickness), y, // x1, y1
-                ((end_col+1) * this.unit_area) - ceil(0.5 * this.wall_thickness), y); // x2, y2
+            line((start_col * this.unit_area) + (2 * this.offset), y + this.offset, // x1, y1
+                ((end_col+1) * this.unit_area), y + this.offset); // x2, y2
         }
     }
 
