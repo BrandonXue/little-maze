@@ -23,6 +23,10 @@ function setup() { // P5 Setup Function
     
     // Use the binary space partition to create the maze
     bsp_maze(maze);
+    for (let i = 0; i < 40; ++i) {
+        console.log(maze.has_left_wall(0, i), maze.has_right_wall(0, i),
+                    maze.has_top_wall(0, i), maze.has_bot_wall(0, i));
+    }
 }
 
 /**

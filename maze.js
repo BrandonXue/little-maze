@@ -61,8 +61,8 @@ class Maze {
             line(x, start_row * this.unit_area, // x1, y1
                  x, (end_row+1) * this.unit_area); // x2, y2
         } else { // Shorten holes slightly
-            line(x, (start_row * this.unit_area) + this.wall_thickness, // x1, y1
-                x, (end_row+1) * this.unit_area) - this.wall_thickness; // x2, y2
+            line(x, (start_row * this.unit_area) + ceil(0.5 * this.wall_thickness), // x1, y1
+                x, (end_row+1) * this.unit_area) - ceil(0.5 * this.wall_thickness); // x2, y2
         }
     }
 
@@ -102,18 +102,21 @@ class Maze {
             }
         }
         // Internal wall
-        else {
+        else if ((left_col + 1) == right_col) {
             if (val) {
                 for (let segment = start_row; segment <= end_row; ++segment) {
-                    if (val) {
-                        this.grid[segment][left_col] |= WallEnum.right;
-                        this.grid[segment][right_col] |= WallEnum.left;
-                    } else {
-                        this.grid[segment][left_col] &= ~WallEnum.right;
-                        this.grid[segment][right_col] &= ~WallEnum.left;
-                    }
+                    this.grid[segment][left_col] |= WallEnum.right;
+                    this.grid[segment][right_col] |= WallEnum.left;
+                }
+            } else {
+                for (let segment = start_row; segment <= end_row; ++segment) {
+                    this.grid[segment][left_col] &= ~WallEnum.right;
+                    this.grid[segment][right_col] &= ~WallEnum.left;
                 }
             }
+        }
+        else {
+            console.log("Error: set_vertical_wall: left and right not adjacent.");
         }
     }
 
@@ -146,8 +149,8 @@ class Maze {
             line(start_col * this.unit_area, y, // x1, y1
                  (end_col+1) * this.unit_area, y); // x2, y2
         } else { // Shorten holes slightly
-            line((start_col * this.unit_area) + this.wall_thickness, y, // x1, y1
-                ((end_col+1) * this.unit_area) - this.wall_thickness, y); // x2, y2
+            line((start_col * this.unit_area) + ceil(0.5 * this.wall_thickness), y, // x1, y1
+                ((end_col+1) * this.unit_area) - ceil(0.5 * this.wall_thickness), y); // x2, y2
         }
     }
 
@@ -177,25 +180,28 @@ class Maze {
         else if ((top_row == this.row_count-1) && (bot_row == this.row_count)) {
             if (val) {
                 for (let segment = start_col; segment <= end_col; ++segment)
-                    this.grid[top_row][segment] |= WallEnum.bottom;
+                    this.grid[top_row][segment] |= WallEnum.bot;
             } else {
-                for (let segment = start_row; segment <= end_row; ++segment)
-                    this.grid[top_row][segment] &= ~WallEnum.bottom;
+                for (let segment = start_col; segment <= end_col; ++segment)
+                    this.grid[top_row][segment] &= ~WallEnum.bot;
             }
         }
         // Internal wall
-        else {
+        else if ((top_row + 1) == bot_row) {
             if (val) {
                 for (let segment = start_col; segment <= end_col; ++segment) {
-                    if (val) {
-                        this.grid[top_row][segment] |= WallEnum.bottom;
-                        this.grid[bot_row][segment] |= WallEnum.top;
-                    } else {
-                        this.grid[top_row][segment] &= ~WallEnum.bottom;
-                        this.grid[bot_row][segment] &= ~WallEnum.top;
-                    }
+                    this.grid[top_row][segment] |= WallEnum.bot;
+                    this.grid[bot_row][segment] |= WallEnum.top;
+                }
+            } else {
+                for (let segment = start_col; segment <= end_col; ++segment) {
+                    this.grid[top_row][segment] &= ~WallEnum.bot;
+                    this.grid[bot_row][segment] &= ~WallEnum.top;
                 }
             }
+        }
+        else {
+            console.log("Error: set_horizontal_wall: top and bot not adjacent.");
         }
     }
 
@@ -205,7 +211,7 @@ class Maze {
      * @param {Number} col Integer column index.
      */
     has_left_wall(row, col) {
-        return this.grid[row][col] & WallEnum.left;
+        return (this.grid[row][col] & WallEnum.left) ? true: false;
     }
 
     /**
@@ -214,7 +220,7 @@ class Maze {
      * @param {Number} col Integer column index.
      */
     has_right_wall(row, col) {
-        return this.grid[row][col] & WallEnum.right;
+        return (this.grid[row][col] & WallEnum.right) ? true : false;
     }
 
     /**
@@ -222,8 +228,8 @@ class Maze {
      * @param {Number} row Integer row index.
      * @param {Number} col Integer column index.
      */
-    has_left_wall(row, col) {
-        return this.grid[row][col] & WallEnum.top;
+    has_top_wall(row, col) {
+        return (this.grid[row][col] & WallEnum.top) ? true : false;
     }
 
     /**
@@ -231,8 +237,8 @@ class Maze {
      * @param {Number} row Integer row index.
      * @param {Number} col Integer column index.
      */
-    has_left_wall(row, col) {
-        return this.grid[row][col] & WallEnum.bottom;
+    has_bot_wall(row, col) {
+        return (this.grid[row][col] & WallEnum.bot) ? true : false;
     }
 }          
 
@@ -241,20 +247,41 @@ class Maze {
  * Easy to use function to begin the recursive binary space partition
  */
 function bsp_maze(maze) {
-    // Create perimeter
+    strokeCap(SQUARE);
+    /** Create perimeter **/
     maze.set_vertical_wall(-1, 0, 0, maze.row_count-1, true); // Left
-    maze.draw_vertical_wall(-1, 0, 0, maze.row_count-1, true)
-    maze.set_vertical_wall(maze.col_count-1, maze.col_count, 0, maze.row_count-1, true);
+    maze.draw_vertical_wall(-1, 0, 0, maze.row_count-1, true);
+    maze.set_vertical_wall(maze.col_count-1, maze.col_count, 0, maze.row_count-1, true); // Right
     maze.draw_vertical_wall(maze.col_count-1, maze.col_count, 0, maze.row_count-1, true);
     maze.set_horizontal_wall(0, maze.col_count-1, -1, 0, true);  // Top
     maze.draw_horizontal_wall(0, maze.col_count-1, -1, 0, true);
     maze.set_horizontal_wall(0, maze.col_count-1, maze.row_count-1, maze.row_count, true);  // Bot
-    maze.draw_horizontal_wall(0, maze.col_count-1, maze.row_count-1, maze.row_count, true)
+    maze.draw_horizontal_wall(0, maze.col_count-1, maze.row_count-1, maze.row_count, true);
+    
+    /** Create entrance and exit **/
+    // Randomly decide whether entrance and exit are vertical or horizontal.
+    // Entrance and exit are vertical
+    if (rand_int(0, 1)) {
+        // Randomly choose a row index for both holes
+        let h1 = rand_int(0, maze.row_count-1);
+        let h2 = rand_int(0, maze.row_count-1);
+        maze.set_vertical_wall(-1, 0, h1, h1, false); // Left
+        maze.draw_vertical_wall(-1, 0, -1, 0, h1, h1, false);
+        maze.set_vertical_wall(maze.col_count-1, maze.col_count, h2, h2, false); // Right
+        maze.draw_vertical_wall(maze.col_count-1, maze.col_count, h2, h2, false);
+    }
+    // Entrance and exit are horizontal
+    else {
+        // Randomly choose a column index for both holes
+        let h1 = rand_int(0, maze.col_count-1);
+        let h2 = rand_int(0, maze.col_count-1);
+        maze.set_horizontal_wall(h1, h1, -1, 0, false);  // Top
+        maze.draw_horizontal_wall(h1, h1, -1, 0, false);
+        maze.set_horizontal_wall(h2, h2, maze.row_count-1, maze.row_count, false);  // Bot
+        maze.draw_horizontal_wall(h2, h2, maze.row_count-1, maze.row_count, false);
+    }
 
-    //Create entrance and exit
-    /** TODO **/
-
-    //Create internal walls via recursive partition
+    /** Create internal walls via recursive partition **/
     binary_space_partition(0, maze.row_count-1, 0, maze.col_count-1, DirectionEnum.vertical, maze);
 }
 

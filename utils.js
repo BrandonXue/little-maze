@@ -15,7 +15,13 @@ Object.freeze(DirectionEnum)
       
 /* WallEnum allows for easy bit manipulation. We store walls in a "bit field"
     so they can be set and unset using bitwise operations */
-const WallEnum = {"left":8, "right":4, "top":2, "bottom":1}
+const WallEnum = {
+    "left": 8,
+    "right": 4,
+    "top": 2,
+    "bot": 1,
+    "bottom": 1
+}
 Object.freeze(WallEnum)
 
 /**
