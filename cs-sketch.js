@@ -295,3 +295,50 @@ function mousePressed() {
     //console.log( "bot x,y = " + g_bot.x + "," + g_bot.y );
     draw_bot();
 }
+
+// 0000LRTB
+function has_left_wall(row, col) {
+    ff = maze[row][col]; // unsigned 8bit integer value 0000L000
+    if(ff & WallEnum.left){
+        return true;
+    }
+    else{
+        return false;
+    }
+}          
+
+function has_right_wall(row, col) {
+    ff = maze[row][col]; // unsigned 8bit integer value 00000R00
+    if(ff & WallEnum.right){
+        return true;
+    }
+    else{
+        return false;
+    }
+} 
+
+function has_top_wall(row, col) {
+    ff = maze[row][col]; // unsigned 8bit integer value 000000T0
+    if(ff & WallEnum.top){
+        return true;
+    }
+    else{
+        return false;
+    }
+} 
+
+function has_bot_wall(row, col) {
+    ff = maze[row][col]; // unsigned 8bit integer value 0000000B
+    if(ff & WallEnum.bottom){
+        return true;
+    }
+    else{
+        return false;
+    }
+} 
+
+//function move(row, col, direction) {
+//TODO
+//}
+
+
