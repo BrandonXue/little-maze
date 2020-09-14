@@ -20,13 +20,6 @@ function setup() { // P5 Setup Function
     let width = (maze.col_count * maze.unit_area) + maze.wall_thickness;
     let height = (maze.row_count * maze.unit_area) + maze.wall_thickness;
     createCanvas(width, height);
-
-    /* The grid is an array of uint arrays. The lowest order 4 bits of the uint array
-       are used to track the walls that surround that cell. The bits are LRTB,
-       where left: 1000, right: 0100, top: 0010, bottom: 0001 */ 
-    maze.grid = Array(maze.row_count);
-    for (let row = 0; row < maze.row_count; ++row)
-        maze.grid[row] = new Uint8Array(maze.col_count);
     
     // Use the binary space partition to create the maze
     bsp_maze(maze);

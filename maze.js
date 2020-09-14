@@ -22,6 +22,13 @@ class Maze {
         this.col_count = cols;
         this.wall_thickness = w_weight;
         this.unit_area = unit;
+
+        /* The grid is an array of uint arrays. The lowest order 4 bits of the uint array
+           are used to track the walls that surround that cell. The bits are LRTB,
+           where left: 1000, right: 0100, top: 0010, bottom: 0001 */ 
+        this.grid = Array(this.row_count);
+        for (let row = 0; row < this.row_count; ++row)
+            this.grid[row] = new Uint8Array(this.col_count);
     }
 
     /**
