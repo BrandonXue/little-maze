@@ -22,7 +22,10 @@ function setup() { // P5 Setup Function
     createCanvas(width, height);
     
     // Use the binary space partition to create the maze
-    bsp_maze(maze);
+    //bsp_maze(maze);
+
+    // Use Kruskal's Algorithm with random joinins to create the maze
+    k_msp_maze(maze);
 }
 
 /**
