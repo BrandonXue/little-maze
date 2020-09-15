@@ -45,9 +45,14 @@ class DisjointSet {
             this.sets = new Array(starting_sets);
         }
         this.num_sets = starting_sets;
+
+        for (let i = 0; i < this.sets.length; ++i) {
+            this.sets[i] = 0;
+        }
     }
 
     get_update_root(set_index) {
+        //console.log(set_index);
         if (this.sets[set_index] == 0) // The current node is the root of its tree
             return set_index;
 

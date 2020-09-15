@@ -348,46 +348,77 @@ function binary_space_partition(left_col, right_col, top_row, bot_row, dir, maze
 }
 
 function k_msp_maze(maze) {
+    strokeCap(SQUARE);
+    // TODO: Fill the entire grid with walls
+    for (let i = -1; i < maze.col_count; ++i) {
+        maze.set_vertical_wall(i, i+1, 0, maze.row_count-1, true); // Left
+        maze.draw_vertical_wall(i, i+1, 0, maze.row_count-1, true);
+    }
+    for (let i = -1; i < maze.row_count; ++i) {
+        maze.set_horizontal_wall(0, maze.col_count-1, i, i+1, true);  // Top
+        maze.draw_horizontal_wall(0, maze.col_count-1, i, i+1, true);
+    }
+
     // Create a new disjoint set with one set for each cell in the maze grid
     let total_cells = maze.row_count * maze.col_count;
-    let total_edges = total_cells * 4;
+    let total_edges = (2 * maze.row_count * maze.col_count) - maze.row_count - maze.col_count;
     let cell_sets = new DisjointSet(total_cells);
-    let edge_sequence;
-    if (total_edges < 256) { // 2^8
-        edge_sequence = new Uint8Array(total_edges);
-    } else if (total_edges < 65536) { // 2^16
-        edge_sequence = new Uint16Array(total_edges);
-    } else if (total_edges < 4294967296) { // 2^32
-        edge_sequence = new Uint32Array(total_edges);
-    } else {
-        edge_sequence = new Array(total_edges);
-    }
+    let edge_sequence = Array(total_edges);
+
     // Initialize a sequence of all of the edges
     // The edges will be in LRTB format, where the edges of one cell are enumerated
     // before enumerating the next cell. The order of the cells will be row major,
     // starting from the left-most column on each row and going right.
-    for (let i = 0; i < total_edges; ++i) {
-        edge_sequence[i] = i;
+    // let left = ((row)*3 + (col)) * 2;
+    // let top = ((row)*3 + (col)) * 2 + 1;
+    let index = 0;
+    for (let i = 0; i < total_cells; ++i) {
+        // If we're not in the left column, push left walls
+        if ((i % maze.col_count) != 0) {
+            edge_sequence[index++] = 2 * i;
+        }
+        // If we're not in the top row, push top walls
+        if (i >= maze.col_count) {
+            edge_sequence[index++] = (2 * i) + 1;
+        }
     }
 
-    // While we still have more than one set, iterate over all the edges randomly,
-    // and try to join the sets of the cell on each side
-    while (cell_sets.num_sets > 1) {
-        // Shuffle the edge array using Fisher-Yates
-        for (let i = total_edges-1; i > 0; --i) {
-            const j = floor(random() * (i + 1));
-            let temp = edge_sequence[i];
-            edge_sequence[i] = edge_sequence[j];
-            edge_sequence[j] = temp;
-        }
+    // Shuffle the edge array using Fisher-Yates
+    for (let i = edge_sequence.length-1; i > 0; --i) {
+        const j = floor(random() * (i + 1));
+        let temp = edge_sequence[i];
+        edge_sequence[i] = edge_sequence[j];
+        edge_sequence[j] = temp;
+    }
 
-        for (let i = 0; i < edge_sequence.length; ++i) {
-            let cell = cell_sets.get_update_root(floor(edge_sequence[i] / 4));
-            let 
+    // Iterate over all shuffled edges and delete if possible
+    for (let i = 0; i < edge_sequence.length;) {
+        let is_top = (edge_sequence[i] % 2) != 0;
+        let grid_index1 = floor(edge_sequence[i] / 2);
+        let grid_index2 = is_top ? grid_index1 - maze.col_count : grid_index1-1;
+        //console.log(grid_index1, grid_index2, edge_sequence[i], (is_top ? "top wall" : "left wall"));
+        let deleted = cell_sets.try_join_trees(grid_index1, grid_index2);
+        if (deleted) {
+            // Horizontal walls
+            if (is_top) {
+                let row_above = floor(grid_index2 / maze.col_count);
+                let row_below = row_above + 1;
+                let column = grid_index1 % maze.col_count;
+                maze.set_horizontal_wall(column, column, row_above, row_below, false);
+                maze.draw_horizontal_wall(column, column, row_above, row_below, false);
+            }
+            // Vertical walls
+            else {
+                let col_left = floor(grid_index2 % maze.col_count);
+                let col_right = col_left + 1;
+                let row = floor(grid_index1 / maze.col_count);
+                maze.set_vertical_wall(col_left, col_right, row, row, false);
+                maze.draw_vertical_wall(col_left, col_right, row, row, false);
+            }
+            edge_sequence.splice(i, 1);
+        } else {
+            ++i;
         }
-        break;
     }
-    for (let i = 0; i < total_edges; ++i) {
-        console.log(edge_sequence[i]);
-    }
+    console.log(cell_sets.num_sets);
 }
