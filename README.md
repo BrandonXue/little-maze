@@ -5,4 +5,4 @@ A program that displays a generated maze, and a bot that runs through the maze. 
 The maze will have no loops or islands. This allows the bot to use the left-hand rule, leaving a path (without side dead-ends) from the start to the exit.
 
 ## Contributors
-Brandon Xue, Ernesto Hooghkirk, Ryan Martinez, Tuan Lai
+Brandon Xue, Ernesto Hooghkirk, Ryan Martinez
