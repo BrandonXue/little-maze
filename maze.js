@@ -365,12 +365,9 @@ function k_msp_maze(maze) {
     let cell_sets = new DisjointSet(total_cells);
     let edge_sequence = Array(total_edges);
 
-    // Initialize a sequence of all of the edges
-    // The edges will be in LRTB format, where the edges of one cell are enumerated
-    // before enumerating the next cell. The order of the cells will be row major,
-    // starting from the left-most column on each row and going right.
-    // let left = ((row)*3 + (col)) * 2;
-    // let top = ((row)*3 + (col)) * 2 + 1;
+    // Initialize a sequence of all of the edges starting from the left-most
+    // column on each row and going right. Only enumerate left and top walls
+    // for each cell, skipping the top walls of row 0 and left walls of col 0.
     let index = 0;
     for (let i = 0; i < total_cells; ++i) {
         // If we're not in the left column, push left walls
@@ -383,19 +380,13 @@ function k_msp_maze(maze) {
         }
     }
 
-    // Shuffle the edge array using Fisher-Yates
-    for (let i = edge_sequence.length-1; i > 0; --i) {
-        const j = floor(random() * (i + 1));
-        let temp = edge_sequence[i];
-        edge_sequence[i] = edge_sequence[j];
-        edge_sequence[j] = temp;
-    }
-
-    // Iterate over all shuffled edges and delete if possible
-    for (let i = 0; i < edge_sequence.length;) {
-        let is_top = (edge_sequence[i] % 2) != 0;
-        let grid_index1 = floor(edge_sequence[i] / 2);
-        let grid_index2 = is_top ? grid_index1 - maze.col_count : grid_index1-1;
+    // While we have more than one set
+    // Iterate over all edges and delete if possible
+    while (cell_sets.num_sets > 1) {
+        const i = floor(random() * edge_sequence.length);
+        const is_top = (edge_sequence[i] % 2) != 0;
+        const grid_index1 = floor(edge_sequence[i] / 2);
+        const grid_index2 = is_top ? grid_index1 - maze.col_count : grid_index1-1;
         //console.log(grid_index1, grid_index2, edge_sequence[i], (is_top ? "top wall" : "left wall"));
         let deleted = cell_sets.try_join_trees(grid_index1, grid_index2);
         if (deleted) {
@@ -415,10 +406,10 @@ function k_msp_maze(maze) {
                 maze.set_vertical_wall(col_left, col_right, row, row, false);
                 maze.draw_vertical_wall(col_left, col_right, row, row, false);
             }
-            edge_sequence.splice(i, 1);
-        } else {
-            ++i;
         }
+        // Remove the edge from the array.
+        // If it is deleted, we no longer need to track it.
+        // If it couldn't be deleted, we will never need to check if it can be deleted again.
+        edge_sequence.splice(i, 1);
     }
-    console.log(cell_sets.num_sets);
 }
