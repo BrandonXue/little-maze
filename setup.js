@@ -14,7 +14,11 @@ var g_frame_mod = 24; // Update ever 'mod' frames.
  * Check reference for more info: https://p5js.org/reference/#/p5/setup
  */
 function setup() { // P5 Setup Function
-    var maze = new Maze(40, 40, 3, 15);
+    var script=document.createElement('script');
+    script.src='https://rawgit.com/paulirish/memory-stats.js/master/bookmarklet.js';
+    document.head.appendChild(script);
+
+    var maze = new Maze(150, 150, 3, 15);
 
     // Calculate canvas dimensions and create canvas
     const width = (maze.col_count * maze.unit_area) + maze.wall_thickness;
