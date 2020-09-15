@@ -347,40 +347,47 @@ function binary_space_partition(left_col, right_col, top_row, bot_row, dir, maze
     }
 }
 
-class DisjointSet {
-    constructor(starting_sets) {
-        if (starting_sets < 256) { // 2^8
-            this.sets = new Uint8Array(starting_sets);
-        } else if (starting_sets < 65536) { // 2^16
-            this.sets = new Uint16Array(starting_sets);
-        } else if (starting_sets < 4294967296) { // 2^32
-            this.sets = new Uint32Array(starting_sets);
-        } else {
-            this.sets = new Array(starting_sets);
+function k_msp_maze(maze) {
+    // Create a new disjoint set with one set for each cell in the maze grid
+    let total_cells = maze.row_count * maze.col_count;
+    let total_edges = total_cells * 4;
+    let cell_sets = new DisjointSet(total_cells);
+    let edge_sequence;
+    if (total_edges < 256) { // 2^8
+        edge_sequence = new Uint8Array(total_edges);
+    } else if (total_edges < 65536) { // 2^16
+        edge_sequence = new Uint16Array(total_edges);
+    } else if (total_edges < 4294967296) { // 2^32
+        edge_sequence = new Uint32Array(total_edges);
+    } else {
+        edge_sequence = new Array(total_edges);
+    }
+    // Initialize a sequence of all of the edges
+    // The edges will be in LRTB format, where the edges of one cell are enumerated
+    // before enumerating the next cell. The order of the cells will be row major,
+    // starting from the left-most column on each row and going right.
+    for (let i = 0; i < total_edges; ++i) {
+        edge_sequence[i] = i;
+    }
+
+    // While we still have more than one set, iterate over all the edges randomly,
+    // and try to join the sets of the cell on each side
+    while (cell_sets.num_sets > 1) {
+        // Shuffle the edge array using Fisher-Yates
+        for (let i = total_edges-1; i > 0; --i) {
+            const j = floor(random() * (i + 1));
+            let temp = edge_sequence[i];
+            edge_sequence[i] = edge_sequence[j];
+            edge_sequence[j] = temp;
         }
-        this.num_sets = starting_sets;
+
+        for (let i = 0; i < edge_sequence.length; ++i) {
+            let cell = cell_sets.get_update_root(floor(edge_sequence[i] / 4));
+            let 
+        }
+        break;
     }
-
-    get_update_root(set_index) {
-        if (this.sets[set_index] == 0) // The current node is the root of its tree
-            return set_index;
-
-        // Else, sets[set_index] will hold the index of its parent
-        // Recursively find the root, updating each node in the path
-        let root = this.get_update_root(this.sets[set_index]);
-        this.sets[set_index] = root;
-        return root; // Finally return root
-    }
-
-    try_join_trees(index1, index2) {
-        let root1 = this.get_update_root(index1);
-        let root2 = this.get_update_root(index2);
-        // If both nodes are already part of the same tree, return false
-        if (root1 == root2)
-            return false;
-        // Else, make tree 2's root point to tree 1's root
-        this.sets[root2] = root1;
-        this.num_sets -= 1; // Decrement total number of sets
-        return true;
+    for (let i = 0; i < total_edges; ++i) {
+        console.log(edge_sequence[i]);
     }
 }
