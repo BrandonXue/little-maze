@@ -58,7 +58,7 @@ class Maze {
         if ((start_row > end_row))
             console.log("Error: draw_vertical_wall: end row must be >= start row.");
 
-        let x = right_col * this.unit_area;
+        const x = right_col * this.unit_area;
         if (val) {
             line(x + this.offset, (start_row * this.unit_area) + this.offset, // x1, y1
                  x + this.offset, ((end_row+1) * this.unit_area) + this.offset); // x2, y2
@@ -146,7 +146,7 @@ class Maze {
         if ((start_col > end_col))
             console.log("Error: draw_horizontal_wall: end col must be >= start col.");
 
-        let y = bot_row * this.unit_area;
+        const y = bot_row * this.unit_area;
         if (val) {
             line((start_col * this.unit_area) + this.offset, y + this.offset, // x1, y1
                  (end_col+1) * this.unit_area + this.offset, y + this.offset); // x2, y2
@@ -208,6 +208,22 @@ class Maze {
     }
 
     /**
+     * Draws and sets a horizontal wall.
+     */
+    horizontal_wall(start_col, end_col, top_row, bot_row, val) {
+        this.set_horizontal_wall(start_col, end_col, top_row, bot_row, val);
+        this.draw_horizontal_wall(start_col, end_col, top_row, bot_row, val);
+    }
+
+    /**
+     * Draws and sets a vertical wall.
+     */
+    vertical_wall(left_col, right_col, start_row, end_row, val) {
+        this.set_vertical_wall(left_col, right_col, start_row, end_row, val);
+        this.draw_vertical_wall(left_col, right_col, start_row, end_row, val);
+    }
+
+    /**
      * Check if the cell at the given row and column has a left wall.
      * @param {Number} row Integer row index.
      * @param {Number} col Integer column index.
@@ -246,6 +262,25 @@ class Maze {
 
 
 /**
+ * Creates a hole somewhere along the perimeter of the maze.
+ * @param {Maze} maze The Maze object to be modified
+ */
+function create_ent_ext(maze) {
+    /** Randomly create entrance and exit **/
+    if (rand_int(0, 1)) { // Entrance and exit are on left and right perimeter walls
+        const h1 = rand_int(0, maze.row_count-1); // Random index for hole 1
+        const h2 = rand_int(0, maze.row_count-1); // Random index for hole 2
+        maze.vertical_wall(-1, 0, h1, h1, false); // Left
+        maze.vertical_wall(maze.col_count-1, maze.col_count, h2, h2, false); // Right
+    } else { // Entrance and exit are on top and bottom perimeter walls
+        const h1 = rand_int(0, maze.col_count-1); // Random index for hole 1
+        const h2 = rand_int(0, maze.col_count-1); // Random index for hole 2
+        maze.horizontal_wall(h1, h1, -1, 0, false);  // Top
+        maze.horizontal_wall(h2, h2, maze.row_count-1, maze.row_count, false);  // Bot
+    }
+}
+
+/**
  * Creates walls in the maze through binary space partitioning, and also
  * draws the walls on the canvas. The maze will have a perimeter with a
  * random entrance and exit chosen on opposite edges of the perimeter.
@@ -254,37 +289,13 @@ class Maze {
 function bsp_maze(maze) {
     strokeCap(SQUARE);
     /** Create perimeter **/
-    maze.set_vertical_wall(-1, 0, 0, maze.row_count-1, true); // Left
-    maze.draw_vertical_wall(-1, 0, 0, maze.row_count-1, true);
-    maze.set_vertical_wall(maze.col_count-1, maze.col_count, 0, maze.row_count-1, true); // Right
-    maze.draw_vertical_wall(maze.col_count-1, maze.col_count, 0, maze.row_count-1, true);
-    maze.set_horizontal_wall(0, maze.col_count-1, -1, 0, true);  // Top
-    maze.draw_horizontal_wall(0, maze.col_count-1, -1, 0, true);
-    maze.set_horizontal_wall(0, maze.col_count-1, maze.row_count-1, maze.row_count, true);  // Bot
-    maze.draw_horizontal_wall(0, maze.col_count-1, maze.row_count-1, maze.row_count, true);
+    maze.vertical_wall(-1, 0, 0, maze.row_count-1, true); // Left
+    maze.vertical_wall(maze.col_count-1, maze.col_count, 0, maze.row_count-1, true); // Right
+    maze.horizontal_wall(0, maze.col_count-1, -1, 0, true);  // Top
+    maze.horizontal_wall(0, maze.col_count-1, maze.row_count-1, maze.row_count, true);  // Bot
     
-    /** Create entrance and exit **/
-    // Randomly decide whether entrance and exit are vertical or horizontal.
-    // Entrance and exit are vertical
-    if (rand_int(0, 1)) {
-        // Randomly choose a row index for both holes
-        let h1 = rand_int(0, maze.row_count-1);
-        let h2 = rand_int(0, maze.row_count-1);
-        maze.set_vertical_wall(-1, 0, h1, h1, false); // Left
-        maze.draw_vertical_wall(-1, 0, -1, 0, h1, h1, false);
-        maze.set_vertical_wall(maze.col_count-1, maze.col_count, h2, h2, false); // Right
-        maze.draw_vertical_wall(maze.col_count-1, maze.col_count, h2, h2, false);
-    }
-    // Entrance and exit are horizontal
-    else {
-        // Randomly choose a column index for both holes
-        let h1 = rand_int(0, maze.col_count-1);
-        let h2 = rand_int(0, maze.col_count-1);
-        maze.set_horizontal_wall(h1, h1, -1, 0, false);  // Top
-        maze.draw_horizontal_wall(h1, h1, -1, 0, false);
-        maze.set_horizontal_wall(h2, h2, maze.row_count-1, maze.row_count, false);  // Bot
-        maze.draw_horizontal_wall(h2, h2, maze.row_count-1, maze.row_count, false);
-    }
+    // Create entrance and exit
+    create_ent_ext(maze);
 
     /** Create internal walls via recursive partition **/
     binary_space_partition(0, maze.row_count-1, 0, maze.col_count-1, DirectionEnum.vertical, maze);
@@ -300,8 +311,8 @@ function bsp_maze(maze) {
  * @param {Maze} maze A reference to the maze object to be modified
  */
 function binary_space_partition(left_col, right_col, top_row, bot_row, dir, maze) {
-    let d_width = right_col - left_col;
-    let d_height = bot_row - top_row;
+    const d_width = right_col - left_col;
+    const d_height = bot_row - top_row;
 
     // Base case: this region cannot be partitioned
     if (d_width == 0 && d_height == 0) 
@@ -320,27 +331,21 @@ function binary_space_partition(left_col, right_col, top_row, bot_row, dir, maze
 
     if (wall_dir == DirectionEnum.horizontal) { // horizontal wall
         // Choose the wall and hole
-        let wall_choice = floor(random() * d_height) + top_row; // Choose the row just above the proposed wall
-        let hole_choice = rand_int(left_col, right_col); // Choose a hole on the new wall
-        // Set the wall in the matrix and draw the wall on the canvas
-        maze.set_horizontal_wall(left_col, right_col, wall_choice, wall_choice+1, true);
-        maze.draw_horizontal_wall(left_col, right_col, wall_choice, wall_choice+1, true);
-        // Punch a hole out
-        maze.set_horizontal_wall(hole_choice, hole_choice, wall_choice, wall_choice+1, false);
-        maze.draw_horizontal_wall(hole_choice, hole_choice, wall_choice, wall_choice+1, false);
+        const wall_choice = floor(random() * d_height) + top_row; // The row just above the proposed wall
+        const hole_choice = rand_int(left_col, right_col); // A hole on the new wall
+        // Create the wall and hole
+        maze.horizontal_wall(left_col, right_col, wall_choice, wall_choice+1, true);
+        maze.horizontal_wall(hole_choice, hole_choice, wall_choice, wall_choice+1, false);
         // Recursively partition
         binary_space_partition(left_col, right_col, top_row, wall_choice, wall_dir, maze);
         binary_space_partition(left_col, right_col, wall_choice+1, bot_row, wall_dir, maze);
     } else { // vertical wall
         // Choose the wall and hole
-        let wall_choice = floor(random() * d_width) + left_col; // Choose the col just left of proposed wall
-        let hole_choice = rand_int(top_row, bot_row); // Choose a hole on the new wall
-        // Set the wall in the matrix and draw the wall on the canvas
-        maze.set_vertical_wall(wall_choice, wall_choice+1, top_row, bot_row, true);
-        maze.draw_vertical_wall(wall_choice, wall_choice+1, top_row, bot_row, true);
-        // Punch a hole out
-        maze.set_vertical_wall(wall_choice, wall_choice+1, hole_choice, hole_choice, false);
-        maze.draw_vertical_wall(wall_choice, wall_choice+1, hole_choice, hole_choice, false);
+        const wall_choice = floor(random() * d_width) + left_col; // The col just left of proposed wall
+        const hole_choice = rand_int(top_row, bot_row); // A hole on the new wall
+        // Create the wall and hole
+        maze.vertical_wall(wall_choice, wall_choice+1, top_row, bot_row, true);
+        maze.vertical_wall(wall_choice, wall_choice+1, hole_choice, hole_choice, false);
         // Recursively partition
         binary_space_partition(left_col, wall_choice, top_row, bot_row, wall_dir, maze);
         binary_space_partition(wall_choice+1, right_col, top_row, bot_row, wall_dir, maze);
@@ -349,21 +354,20 @@ function binary_space_partition(left_col, right_col, top_row, bot_row, dir, maze
 
 function k_msp_maze(maze) {
     strokeCap(SQUARE);
-    // TODO: Fill the entire grid with walls
-    for (let i = -1; i < maze.col_count; ++i) {
-        maze.set_vertical_wall(i, i+1, 0, maze.row_count-1, true); // Left
-        maze.draw_vertical_wall(i, i+1, 0, maze.row_count-1, true);
-    }
-    for (let i = -1; i < maze.row_count; ++i) {
-        maze.set_horizontal_wall(0, maze.col_count-1, i, i+1, true);  // Top
-        maze.draw_horizontal_wall(0, maze.col_count-1, i, i+1, true);
-    }
+    // Fill the entire grid with walls
+    for (let i = -1; i < maze.col_count; ++i)
+        maze.vertical_wall(i, i+1, 0, maze.row_count-1, true); // Left
+    for (let i = -1; i < maze.row_count; ++i)
+        maze.horizontal_wall(0, maze.col_count-1, i, i+1, true);  // Top
 
+    // Create entrance and exit
+    create_ent_ext(maze);
+        
     // Create a new disjoint set with one set for each cell in the maze grid
-    let total_cells = maze.row_count * maze.col_count;
-    let total_edges = (2 * maze.row_count * maze.col_count) - maze.row_count - maze.col_count;
-    let cell_sets = new DisjointSet(total_cells);
-    let edge_sequence = Array(total_edges);
+    const total_cells = maze.row_count * maze.col_count;
+    const total_edges = (2 * maze.row_count * maze.col_count) - maze.row_count - maze.col_count;
+    const cell_sets = new DisjointSet(total_cells);
+    const edge_sequence = Array(total_edges);
 
     // Initialize a sequence of all of the edges starting from the left-most
     // column on each row and going right. Only enumerate left and top walls
@@ -371,13 +375,12 @@ function k_msp_maze(maze) {
     let index = 0;
     for (let i = 0; i < total_cells; ++i) {
         // If we're not in the left column, push left walls
-        if ((i % maze.col_count) != 0) {
+        if ((i % maze.col_count) != 0)
             edge_sequence[index++] = 2 * i;
-        }
+
         // If we're not in the top row, push top walls
-        if (i >= maze.col_count) {
+        if (i >= maze.col_count)
             edge_sequence[index++] = (2 * i) + 1;
-        }
     }
 
     // While we have more than one set
@@ -388,23 +391,21 @@ function k_msp_maze(maze) {
         const grid_index1 = floor(edge_sequence[i] / 2);
         const grid_index2 = is_top ? grid_index1 - maze.col_count : grid_index1-1;
         //console.log(grid_index1, grid_index2, edge_sequence[i], (is_top ? "top wall" : "left wall"));
-        let deleted = cell_sets.try_join_trees(grid_index1, grid_index2);
+        const deleted = cell_sets.try_join_trees(grid_index1, grid_index2);
         if (deleted) {
             // Horizontal walls
             if (is_top) {
-                let row_above = floor(grid_index2 / maze.col_count);
-                let row_below = row_above + 1;
-                let column = grid_index1 % maze.col_count;
-                maze.set_horizontal_wall(column, column, row_above, row_below, false);
-                maze.draw_horizontal_wall(column, column, row_above, row_below, false);
+                const row_above = floor(grid_index2 / maze.col_count);
+                const row_below = row_above + 1;
+                const column = grid_index1 % maze.col_count;
+                maze.horizontal_wall(column, column, row_above, row_below, false);
             }
             // Vertical walls
             else {
-                let col_left = floor(grid_index2 % maze.col_count);
-                let col_right = col_left + 1;
-                let row = floor(grid_index1 / maze.col_count);
-                maze.set_vertical_wall(col_left, col_right, row, row, false);
-                maze.draw_vertical_wall(col_left, col_right, row, row, false);
+                const col_left = floor(grid_index2 % maze.col_count);
+                const col_right = col_left + 1;
+                const row = floor(grid_index1 / maze.col_count);
+                maze.vertical_wall(col_left, col_right, row, row, false);
             }
         }
         // Remove the edge from the array.
