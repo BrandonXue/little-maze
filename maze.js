@@ -246,7 +246,10 @@ class Maze {
 
 
 /**
- * Easy to use function to begin the recursive binary space partition
+ * Creates walls in the maze through binary space partitioning, and also
+ * draws the walls on the canvas. The maze will have a perimeter with a
+ * random entrance and exit chosen on opposite edges of the perimeter.
+ * @param {Maze} maze A Maze object that needs to have its walls modified.
  */
 function bsp_maze(maze) {
     strokeCap(SQUARE);
@@ -288,7 +291,7 @@ function bsp_maze(maze) {
 }
 
 /**
- * Binary space partition maze generator.
+ * Recursive binary space partition maze generator.
  * @param {Number} left_col The left column index of the current partition.
  * @param {Number} right_col The right column index of the current partition.
  * @param {Number} top_row The top row index of the current partition.
