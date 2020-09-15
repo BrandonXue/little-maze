@@ -58,14 +58,14 @@ class DisjointSet {
 
         // Else, sets[set_index] will hold the index of its parent
         // Recursively find the root, updating each node in the path
-        let root = this.get_update_root(this.sets[set_index]);
+        const root = this.get_update_root(this.sets[set_index]);
         this.sets[set_index] = root;
         return root; // Finally return root
     }
 
     try_join_trees(index1, index2) {
-        let root1 = this.get_update_root(index1);
-        let root2 = this.get_update_root(index2);
+        const root1 = this.get_update_root(index1);
+        const root2 = this.get_update_root(index2);
         // If both nodes are already part of the same tree, return false
         if (root1 == root2)
             return false;

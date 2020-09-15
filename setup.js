@@ -17,8 +17,8 @@ function setup() { // P5 Setup Function
     var maze = new Maze(40, 40, 3, 15);
 
     // Calculate canvas dimensions and create canvas
-    let width = (maze.col_count * maze.unit_area) + maze.wall_thickness;
-    let height = (maze.row_count * maze.unit_area) + maze.wall_thickness;
+    const width = (maze.col_count * maze.unit_area) + maze.wall_thickness;
+    const height = (maze.row_count * maze.unit_area) + maze.wall_thickness;
     createCanvas(width, height);
     
     // Use the binary space partition to create the maze
