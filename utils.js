@@ -9,8 +9,16 @@
 
 /* DirectionEnum allows us to signify vertcal or horizontal orientation in
    a more human readable format. If it is ever needed to choose both vertical
-   AND horizontal, a bitwise OR can be used to combine them. */
-const DirectionEnum = {"vertical":2, "horizontal":1}
+   AND horizontal, a bitwise OR can be used to combine them.
+   DirectionEnum can also be used for 2 bit single-direction storing */
+const DirectionEnum = {
+    "vertical":2,
+    "horizontal":1,
+    "left": 0,
+    "right": 1,
+    "up": 2,
+    "down": 3
+}
 Object.freeze(DirectionEnum)
       
 /* WallEnum allows for easy bit manipulation. We store walls in a "bit field"
@@ -176,7 +184,8 @@ class DisjointSet {
 class HashSet {
     constructor(num_elem) {
         // We only need one bit per item, so the size can be 1/8th of total_capacity
-        this.set = new Uint8Array(num_elem/8);
+        // Make sure to round up so we can accomodate all elements
+        this.set = new Uint8Array(ceil(num_elem/8));
     }
 
     /**
