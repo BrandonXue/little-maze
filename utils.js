@@ -33,6 +33,100 @@ function rand_int(min, max) {
     return Math.floor(Math.random() * (max - min + 1) ) + min;
 }
 
+/**
+ * Produces a variable that falls on a normal distribution.
+ * See: https://en.wikipedia.org/wiki/Box–Muller_transform
+ */
+function box_muller_unbounded() {
+    let u1 = 0, u2 = 0;
+    // First make the interval (0, 1) insead of [0, 1)
+    while (u1 == 0)
+        u1 = Math.random();
+    while (u2 == 0)
+        u2 = Math.random();
+    // Use the formula as seen
+    return Math.sqrt(-2 * Math.log(u1)) * Math.sin(2 * Math.PI * u2);
+}
+
+/**
+ * Returns an integer that is almost normally distributed.
+ * The ends of the distribution are intentionally excluded so the range
+ * is more uniform than a true normal distribution.
+ */
+function box_muller_random() {
+    // First get a random number between [-0.5, 0.5)
+    let n = box_muller_unbounded() / 4; // hits the sweet spot
+    while  (n >= 0.5 || n < -0.5)         // makes extremes not too rare
+        n = box_muller_unbounded() / 4;
+
+    n += 0.5; // Now make it [0, 1)
+    return n;
+}
+
+/**
+ * Returns an integer that is almost normally distributed.
+ * The level of "normality" can be heightened with the centering factor.
+ * A centering factor higher than 10 gives a very normal distribution.
+ * A centering factor of 1 produces a much flatter curve.
+ * @param {Number} centering_factor Adjust how tightly normal the distribution is.
+ *      Must be greater than 0.
+ */
+function box_muller_random2(centering_factor) {
+    // First get a random number between [-0.5, 0.5)
+    let n = box_muller_unbounded() / centering_factor; // hits the sweet spot
+    while  (n >= 0.5 || n < -0.5)         // makes extremes not too rare
+        n = box_muller_unbounded() / centering_factor;
+
+    n += 0.5; // Now make it [0, 1)
+    return n;
+}
+
+/**
+ * Slightly normal random number using 2 iterations
+ * (Central limit theorem)
+ */
+function clt_random() {
+    return (random() + random()) / 2;
+}
+
+/**
+ * Slightly divergent random number using 2 iterations
+ */
+function divergent_random() {
+    let n =(random() + random()) / 2;
+    if (n > 0.5)
+        return 1.5-n;
+    return 0.5-n;
+}
+
+/**
+ * Returns a random int within the range favoring the extremities.
+ * @param {Number} min Integer minimum return value.
+ * @param {Number} max Integer maximum return value.
+ */
+function divergent_int(min, max) {
+    return floor(divergent_random() * (max - min + 1)) + min;
+}
+
+
+/**
+ * Returns an integer that falls within the given range.
+ * Somewhat resembles a normal distribution but extreme values are made more common.
+ * @param {Number} min Integer minimum value to be returned
+ * @param {Number} max Integer maximum value to be returned
+ */
+function box_muller_int(min, max) {
+    let n = box_muller_random(); // n in [0, 1)
+    n *= (max - min + 1);
+    n = floor(n);
+    n += min;
+    return n;
+}
+
+/**
+ * A Disjoint Set data structure specifically for checking
+ * for intersection and merging sets.
+ */
 class DisjointSet {
     constructor(starting_sets) {
         if (starting_sets < 256) { // 2^8
@@ -73,5 +167,45 @@ class DisjointSet {
         this.sets[root2] = root1;
         this.num_sets -= 1; // Decrement total number of sets
         return true;
+    }
+}
+
+/**
+ * A HashSet specifically for numeric items from [0, num_elem)
+ */
+class HashSet {
+    constructor(num_elem) {
+        // We only need one bit per item, so the size can be 1/8th of total_capacity
+        this.set = new Uint8Array(num_elem/8);
+    }
+
+    /**
+     * Insert an integer into this set
+     * @param {Number} i Integer, must be betwee [0, max capacity)
+     */
+    insert(i) {
+        const index_in_arr = floor(i / 8);
+        const bit_offset = i % 8;
+        this.set[index_in_arr] |= (0b1 << bit_offset);
+    }
+
+    /**
+     * Check if a number is in the set
+     * @param {Number} i Integer, must be betwee [0, max capacity)
+     */
+    contains(i) {
+        const index_in_arr = floor(i / 8);
+        const bit_offset = i % 8;
+        return ( this.set[index_in_arr] & (0b1 << bit_offset) ) == (0b1 << bit_offset);
+    }
+
+    /**
+     * Remove an element from the set
+     * @param {Number} i Integer, must be betwee [0, max capacity)
+     */
+    remove(i) {
+        const index_in_arr = floor(i / 8);
+        const bit_offset = i % 8;
+        this.set[index_in_arr] &= ~(0b1 << bit_offset);
     }
 }
