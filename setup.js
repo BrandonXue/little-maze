@@ -14,7 +14,7 @@ var g_frame_mod = 24; // Update ever 'mod' frames.
  * Check reference for more info: https://p5js.org/reference/#/p5/setup
  */
 function setup() { // P5 Setup Function
-    var maze = new Maze(150, 150, 3, 15);
+    var maze = new Maze(40, 40, 3, 15);
 
     // Calculate canvas dimensions and create canvas
     const width = (maze.col_count * maze.unit_area) + maze.wall_thickness;
@@ -22,10 +22,10 @@ function setup() { // P5 Setup Function
     createCanvas(width, height);
     
     // Use the binary space partition to create the maze
-    //bsp_maze(maze);
+    bsp_maze(maze);
 
     // Use Kruskal's Algorithm with random joinins to create the maze
-    k_msp_maze(maze);
+    //k_msp_maze(maze);
 }
 
 /**

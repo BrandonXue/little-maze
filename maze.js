@@ -23,6 +23,8 @@ class Maze {
         this.wall_thickness = w_weight;
         this.offset = this.wall_thickness * 0.5;
         this.unit_area = unit;
+        this.wall_color = "white";
+        this.fill_color = "black";
 
         /* The grid is an array of uint arrays. The lowest order 4 bits of the uint array
            are used to track the walls that surround that cell. The bits are LRTB,
@@ -30,6 +32,53 @@ class Maze {
         this.grid = Array(this.row_count);
         for (let row = 0; row < this.row_count; ++row)
             this.grid[row] = new Uint8Array(this.col_count);
+
+        this.fill_background();
+    }
+
+    /**
+     * Fills the maze grid area with the background color specified by this.fill_color
+     */
+    fill_background() {
+        const width = (this.col_count * this.unit_area) + this.wall_thickness;
+        const height = (this.row_count * this.unit_area) + this.wall_thickness;
+        fill(this.fill_color);
+        rect(0, 0, width, height);
+    }
+
+    /**
+     * Repaint the entire maze.
+     * This can be used when colors have been changed.
+     */
+    repaint() {
+        this.fill_background();
+        // Go over all cells in the grid and repaint their left and top walls
+        for (let row = 0; row < this.row_count; ++row) {
+            for (let col = 0; col < this.col_count; ++col) {
+                if (this.has_left_wall(row, col))
+                    this.vertical_wall(col-1, col, row, row, true);
+                else
+                    this.vertical_wall(col-1, col, row, row, false);
+                if (this.has_top_wall(row, col))
+                    this.horizontal_wall(col, col, row-1, row, true);
+                else
+                    this.horizontal_wall(col, col, row-1, row, false);
+            }
+        }
+        // Then go over the right column to do its right wall
+        for (let row = 0; row < this.row_count; ++row) {
+            if (this.has_right_wall(row, this.col_count-1))
+                this.vertical_wall(this.col_count-1, this.col_count, row, row, true);
+            else
+                this.vertical_wall(this.col_count-1, this.col_count, row, row, false);
+        }
+        // And go over the bottom row to do its bottom wall
+        for (let col = 0; col < this.col_count; ++col) {
+            if (this.has_bot_wall(this.row_count-1, col))
+                this.horizontal_wall(col, col, this.row_count-1, this.row_count, true);
+            else
+                this.horizontal_wall(col, col, this.row_count-1, this.row_count, false);
+        }
     }
 
     /**
@@ -46,9 +95,9 @@ class Maze {
      */
     draw_vertical_wall(left_col, right_col, start_row, end_row, val) {
         if (val)
-            stroke("white");
+            stroke(this.wall_color);
         else
-            stroke("black");
+            stroke(this.fill_color);
 
         strokeWeight(this.wall_thickness);
 
@@ -60,8 +109,8 @@ class Maze {
 
         const x = right_col * this.unit_area;
         if (val) {
-            line(x + this.offset, (start_row * this.unit_area) + this.offset, // x1, y1
-                 x + this.offset, ((end_row+1) * this.unit_area) + this.offset); // x2, y2
+            line(x + this.offset, (start_row * this.unit_area), // x1, y1
+                 x + this.offset, ((end_row+1) * this.unit_area) + this.wall_thickness); // x2, y2
         } else { // Shorten holes slightly
             line(x + this.offset, (start_row * this.unit_area) + (2 * this.offset), // x1, y1
                  x + this.offset, (end_row+1) * this.unit_area); // x2, y2
@@ -135,9 +184,9 @@ class Maze {
      */
     draw_horizontal_wall(start_col, end_col, top_row, bot_row, val) {
         if (val)
-            stroke("white");
+            stroke(this.wall_color);
         else
-            stroke("black");
+            stroke(this.fill_color);
         strokeWeight(this.wall_thickness);
 
         // Improper arguments
@@ -148,8 +197,8 @@ class Maze {
 
         const y = bot_row * this.unit_area;
         if (val) {
-            line((start_col * this.unit_area) + this.offset, y + this.offset, // x1, y1
-                 (end_col+1) * this.unit_area + this.offset, y + this.offset); // x2, y2
+            line((start_col * this.unit_area), y + this.offset, // x1, y1
+                 (end_col+1) * this.unit_area + this.wall_thickness, y + this.offset); // x2, y2
         } else { // Shorten holes slightly
             line((start_col * this.unit_area) + (2 * this.offset), y + this.offset, // x1, y1
                 ((end_col+1) * this.unit_area), y + this.offset); // x2, y2
@@ -260,6 +309,16 @@ class Maze {
     }
 }          
 
+/**
+ * Creates a perimeter around the maze.
+ * @param {Maze} maze The Maze object to be modified
+ */
+function create_perimeter(maze) {
+    maze.vertical_wall(-1, 0, 0, maze.row_count-1, true); // Left
+    maze.vertical_wall(maze.col_count-1, maze.col_count, 0, maze.row_count-1, true); // Right
+    maze.horizontal_wall(0, maze.col_count-1, -1, 0, true);  // Top
+    maze.horizontal_wall(0, maze.col_count-1, maze.row_count-1, maze.row_count, true);  // Bot
+}
 
 /**
  * Creates a hole somewhere along the perimeter of the maze.
@@ -288,17 +347,14 @@ function create_ent_ext(maze) {
  */
 function bsp_maze(maze) {
     strokeCap(SQUARE);
-    /** Create perimeter **/
-    maze.vertical_wall(-1, 0, 0, maze.row_count-1, true); // Left
-    maze.vertical_wall(maze.col_count-1, maze.col_count, 0, maze.row_count-1, true); // Right
-    maze.horizontal_wall(0, maze.col_count-1, -1, 0, true);  // Top
-    maze.horizontal_wall(0, maze.col_count-1, maze.row_count-1, maze.row_count, true);  // Bot
-    
+    // Create perimeter
+    create_perimeter(maze);
     // Create entrance and exit
     create_ent_ext(maze);
-
     /** Create internal walls via recursive partition **/
-    binary_space_partition(0, maze.row_count-1, 0, maze.col_count-1, DirectionEnum.vertical, maze);
+    // Use a random starting direction for the initial partition
+    const random_dir = random() >= 0.5 ? DirectionEnum.horizontal : DirectionEnum.vertical;
+    binary_space_partition(0, maze.row_count-1, 0, maze.col_count-1, 0.5, random_dir, maze);
 }
 
 /**
@@ -310,7 +366,7 @@ function bsp_maze(maze) {
  * @param {DirectionEnum} dir Used to keep track of the parent partition's splitting orientation.
  * @param {Maze} maze A reference to the maze object to be modified
  */
-function binary_space_partition(left_col, right_col, top_row, bot_row, dir, maze) {
+function binary_space_partition(left_col, right_col, top_row, bot_row, hole_pref, dir, maze) {
     const d_width = right_col - left_col;
     const d_height = bot_row - top_row;
 
@@ -323,32 +379,74 @@ function binary_space_partition(left_col, right_col, top_row, bot_row, dir, maze
         wall_dir = DirectionEnum.horizontal;
     else if (d_height == 0) // Else if height is 0, we cannot create a horizontal wall, so it must be vertical
         wall_dir = DirectionEnum.vertical;
-    else { // Else we can partition either way
-        // Currently alternating, but previously tried randomizing
-        wall_dir = (dir == DirectionEnum.vertical ? DirectionEnum.horizontal : DirectionEnum.vertical);
-        //wall_dir = random() >= 0.5 ? DirectionEnum.horizontal : DirectionEnum.vertical;
+    else { // Else we can partition in either direction
+        // Bias towards keeping the partition square
+        let cutoff = (d_height / (d_height + d_width)); // cutoff higher if area = tall, lower if area = wide
+        // Unless it's a very small partition already. Then try to make longer corridors
+        if (cutoff > 0.5 && d_height < 6) {
+            cutoff = 0.35;
+        } else if (cutoff < 0.5 && d_width < 6) {
+            cutoff = 0.65;
+        }
+        wall_dir = random() >= cutoff ? DirectionEnum.vertical : DirectionEnum.horizontal;
     }
+
+    // If parent partition was in a different direction, reset hole pref
+    if (dir != wall_dir)
+        hole_pref = 0.5;
 
     if (wall_dir == DirectionEnum.horizontal) { // horizontal wall
         // Choose the wall and hole
-        const wall_choice = floor(random() * d_height) + top_row; // The row just above the proposed wall
-        const hole_choice = rand_int(left_col, right_col); // A hole on the new wall
+        const wall_choice = floor(clt_random() * d_height) + top_row; // The row just above the proposed wall
+        let hole_choice;
+        if (dir == wall_dir && random() < 0.95) {
+            if (((wall_choice - top_row) % 2) == 0)
+                hole_choice = (hole_pref ? left_col : right_col);
+            else
+                hole_choice = (hole_pref ? right_col : left_col);
+        } else {
+            hole_choice = rand_int(left_col, right_col); // A hole on the new wall
+        }
+        // Remember the hole preference to make snaky paths
+        if (hole_choice > (left_col + right_col) / 2) {
+            hole_pref = true;
+        } else if ((hole_choice < (left_col + right_col) / 2)) {
+            hole_pref = false;
+        } else {
+            hole_pref = !hole_pref;
+        }
         // Create the wall and hole
         maze.horizontal_wall(left_col, right_col, wall_choice, wall_choice+1, true);
         maze.horizontal_wall(hole_choice, hole_choice, wall_choice, wall_choice+1, false);
         // Recursively partition
-        binary_space_partition(left_col, right_col, top_row, wall_choice, wall_dir, maze);
-        binary_space_partition(left_col, right_col, wall_choice+1, bot_row, wall_dir, maze);
+        binary_space_partition(left_col, right_col, top_row, wall_choice, hole_pref, wall_dir, maze);
+        binary_space_partition(left_col, right_col, wall_choice+1, bot_row, hole_pref, wall_dir, maze);
     } else { // vertical wall
         // Choose the wall and hole
-        const wall_choice = floor(random() * d_width) + left_col; // The col just left of proposed wall
-        const hole_choice = rand_int(top_row, bot_row); // A hole on the new wall
+        const wall_choice = floor(clt_random() * d_width) + left_col; // The col just left of proposed wall
+        let hole_choice;
+        if (dir == wall_dir && random() < 0.95) {
+            if (((wall_choice - left_col) % 2) == 0)
+                hole_choice = (hole_pref ? top_row : bot_row);
+            else 
+                hole_choice = (hole_pref ? bot_row : top_row);
+        } else {
+            hole_choice = rand_int(top_row, bot_row); // A hole on the new wall
+        }
+        // Remember the hole preference to make snaky paths
+        if (hole_choice > (top_row+ bot_row) / 2)
+            hole_pref = true;
+        else if (hole_choice < (top_row+ bot_row) / 2){
+            hole_pref = false;
+        } else {
+            hole_pref = !hole_pref;
+        }
         // Create the wall and hole
         maze.vertical_wall(wall_choice, wall_choice+1, top_row, bot_row, true);
         maze.vertical_wall(wall_choice, wall_choice+1, hole_choice, hole_choice, false);
         // Recursively partition
-        binary_space_partition(left_col, wall_choice, top_row, bot_row, wall_dir, maze);
-        binary_space_partition(wall_choice+1, right_col, top_row, bot_row, wall_dir, maze);
+        binary_space_partition(left_col, wall_choice, top_row, bot_row, hole_pref, wall_dir, maze);
+        binary_space_partition(wall_choice+1, right_col, top_row, bot_row, hole_pref, wall_dir, maze);
     }
 }
 
@@ -367,26 +465,35 @@ function k_msp_maze(maze) {
     const total_cells = maze.row_count * maze.col_count;
     const total_edges = (2 * maze.row_count * maze.col_count) - maze.row_count - maze.col_count;
     const cell_sets = new DisjointSet(total_cells);
-    const edge_sequence = Array(total_edges);
-
+    let edge_sequence;
+    if (total_edges < 256) { // 2^8
+        edge_sequence = new Uint8Array(total_edges);
+    } else if (total_edges < 65536) { // 2^16
+        edge_sequence = new Uint16Array(total_edges);
+    } else if (total_edges < 4294967296) { // 2^32
+        edge_sequence = new Uint32Array(total_edges);
+    } else {
+        edge_sequence = new Array(total_edges);
+    }
+    
     // Initialize a sequence of all of the edges starting from the left-most
     // column on each row and going right. Only enumerate left and top walls
     // for each cell, skipping the top walls of row 0 and left walls of col 0.
-    let index = 0;
+    let count = 0;
     for (let i = 0; i < total_cells; ++i) {
         // If we're not in the left column, push left walls
         if ((i % maze.col_count) != 0)
-            edge_sequence[index++] = 2 * i;
+            edge_sequence[count++] = 2 * i;
 
         // If we're not in the top row, push top walls
         if (i >= maze.col_count)
-            edge_sequence[index++] = (2 * i) + 1;
+            edge_sequence[count++] = (2 * i) + 1;
     }
 
     // While we have more than one set
     // Iterate over all edges and delete if possible
     while (cell_sets.num_sets > 1) {
-        const i = floor(random() * edge_sequence.length);
+        const i = floor(random() * count);
         const is_top = (edge_sequence[i] % 2) != 0;
         const grid_index1 = floor(edge_sequence[i] / 2);
         const grid_index2 = is_top ? grid_index1 - maze.col_count : grid_index1-1;
@@ -411,6 +518,142 @@ function k_msp_maze(maze) {
         // Remove the edge from the array.
         // If it is deleted, we no longer need to track it.
         // If it couldn't be deleted, we will never need to check if it can be deleted again.
-        edge_sequence.splice(i, 1);
+        // since uint arrays dont support splice, we can just swap with the last element and decrement count.
+        edge_sequence[i] = edge_sequence[--count];
     }
+}
+
+function recur_bt_maze(maze) {
+    strokeCap(SQUARE);
+    // Fill the entire grid with walls
+    for (let i = -1; i < maze.col_count; ++i)
+        maze.vertical_wall(i, i+1, 0, maze.row_count-1, true); // Left
+    for (let i = -1; i < maze.row_count; ++i)
+        maze.horizontal_wall(0, maze.col_count-1, i, i+1, true);  // Top
+
+    // Create entrance and exit
+    create_ent_ext(maze);
+
+    const total_cells = maze.row_count * maze.col_count;
+    let visited_set = new HashSet(total_cells);
+
+    let path_stack;
+    if (total_cells < 64) { // 2^6     we need to assume 2 bits are used to store direction
+        path_stack = new Uint8Array(total_cells);
+    } else if (total_cells < 16384) { // 2^14
+        path_stack = new Uint16Array(total_cells);
+    } else if (total_cells < 1073741824) { // 2^30
+        path_stack = new Uint32Array(total_cells);
+    } else {
+        path_stack = new Array(total_cells);
+    }
+
+    let unexplored = total_cells; // Keep track of number of unexplored cells
+    let count = 0; // Keep track of number of elements in the stack
+    let valid = new Array(); // A small array to store valid exploration directions
+
+    const first = rand_int(0, total_cells-1) // A random cell to be added into the path stack
+    const first_row = floor(first / maze.col_count);
+    const first_col = first % maze.col_count;
+    visited_set.insert(first);
+    path_stack[count] = first << 2; // Shift by 2 to make room for storing direction
+    path_stack[count] |= (rand_int(0, 3)) // Assign a random starting direction
+                                    // left: 0, right: 1, top: 2, bottom: 3
+    ++count; --unexplored;
+    // Make sure starting direction is valid
+    //console.log("starting direction:", path_stack[0] & 0b11, path_stack[0]);
+    switch (path_stack[0] & 0b11) { // use bit mask to extract 2-bit direction
+        case 0: // left
+            if (first_col == 0) {
+                path_stack[0] &= ~(0b11); // Clear left direction
+                path_stack[0] |= 0b01; // set right diretion
+            }; // if left column, face right
+            break;
+        case 1: // right
+            if (first_col == maze.col_count-1) {
+                path_stack[0] &= ~(0b11);; // Clear right direction
+                // left is 0, no need to set anything
+            }; // if right column, face left
+            break;
+        case 2: // top
+            if (first_row == 0) {
+                path_stack[0] &= ~(0b11);; // Clear top direction
+                path_stack[0] |= 0b11; // set bot diretion
+            }; // if top row, face bot
+            break;
+        case 3: // bottom
+            if (first_row == maze.row_count-1) {
+                path_stack[0] &= ~(0b11);; // Clear bot direction
+                path_stack[0] |= 0b10; // set top diretion
+            }; // if bot row, face top
+            break;
+    }
+
+    
+    while (unexplored > 0) {
+        // Check all directions around the maze and push valid ones into "valid"
+        const front_index = path_stack[count-1] >>> 2; // right shift to get rid of direction bits
+                                                       // make sure using 0 fill right shift
+        const front_row = floor(front_index / maze.col_count);
+        const front_col = front_index % maze.col_count;
+        // Make sure not to include perimeter walls
+        if ( (front_col > 0) && !visited_set.contains(front_index - 1) )
+            valid.push(WallEnum.left);
+        if ( (front_col < (maze.col_count-1)) && !visited_set.contains(front_index + 1) )
+            valid.push(WallEnum.right);
+        if ( (front_row > 0) && !visited_set.contains(front_index - maze.col_count) )
+            valid.push(WallEnum.top);
+        if ( (front_row < (maze.row_count-1)) && !visited_set.contains(front_index + maze.col_count) )
+            valid.push(WallEnum.bot);
+        // Shuffle all valid directions
+        for (let i = valid.length-1; i > 0; --i) {
+            const j = rand_int(0, i);
+            const temp = valid[j];
+            valid[j] = valid[i];
+            valid[i] = temp;
+        }
+        // If there are no valid directions, pop from stack
+        if (valid.length == 0) {
+            --count;
+            if (count < 0) {
+                console.log("out of bounds");
+                return;
+            }
+        } else { // Else, we must visit a new node
+            --unexplored; // Decrement unexplored nodes
+            path_stack[count-1] &= ~(0b11); // Clear the direction in the current node first
+            let new_cell;
+            // Go in the first direction in our valid array
+            switch (valid[0]) {
+                case WallEnum.left:
+                    maze.vertical_wall(front_col-1, front_col, front_row, front_row, false);
+                    // Left doesn't need to set direction
+                    new_cell = front_index - 1; // Find the index of the cell to the left of current
+                    break;
+                case WallEnum.right:
+                    maze.vertical_wall(front_col, front_col+1, front_row, front_row, false);
+                    path_stack[count-1] |= 0b01; // Set direction travelled as right
+                    new_cell = front_index + 1; // Find the index of the cell to the right of current
+                    break;
+                case WallEnum.top:
+                    maze.horizontal_wall(front_col, front_col, front_row-1, front_row, false);
+                    path_stack[count-1] |= 0b10; // Set direction travelled as up
+                    new_cell = front_index - maze.col_count; // Find the index of the cell above current
+                    break;
+                case WallEnum.bot:
+                    maze.horizontal_wall(front_col, front_col, front_row, front_row+1, false);
+                    path_stack[count-1] |= 0b11; // Set direction travelled as down
+                    new_cell = front_index + maze.col_count; // Find the index of the cell below current
+                    break;
+            }
+
+            // Then add the new cell into the stack, make sure to left shift making room for 2 direction bits
+            path_stack[count++] = new_cell << 2;
+            // Also add new_cell into set, no need to shift for this one
+            visited_set.insert(new_cell);
+        }
+        // Clear the valid directions
+        valid = new Array();
+    }
+
 }
