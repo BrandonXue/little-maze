@@ -497,7 +497,6 @@ function k_msp_maze(maze) {
         const is_top = (edge_sequence[i] % 2) != 0;
         const grid_index1 = floor(edge_sequence[i] / 2);
         const grid_index2 = is_top ? grid_index1 - maze.col_count : grid_index1-1;
-        //console.log(grid_index1, grid_index2, edge_sequence[i], (is_top ? "top wall" : "left wall"));
         const deleted = cell_sets.try_join_trees(grid_index1, grid_index2);
         if (deleted) {
             // Horizontal walls
@@ -523,7 +522,7 @@ function k_msp_maze(maze) {
     }
 }
 
-function recur_bt_maze(maze) {
+function recur_bt_maze(maze, straightness) {
     strokeCap(SQUARE);
     // Fill the entire grid with walls
     for (let i = -1; i < maze.col_count; ++i)
@@ -550,45 +549,13 @@ function recur_bt_maze(maze) {
 
     let unexplored = total_cells; // Keep track of number of unexplored cells
     let count = 0; // Keep track of number of elements in the stack
-    let valid = new Array(); // A small array to store valid exploration directions
 
     const first = rand_int(0, total_cells-1) // A random cell to be added into the path stack
     const first_row = floor(first / maze.col_count);
     const first_col = first % maze.col_count;
     visited_set.insert(first);
-    path_stack[count] = first << 2; // Shift by 2 to make room for storing direction
-    path_stack[count] |= (rand_int(0, 3)) // Assign a random starting direction
-                                    // left: 0, right: 1, top: 2, bottom: 3
+    path_stack[count] = (first << 2); // Shift by 2 to make room for storing direction
     ++count; --unexplored;
-    // Make sure starting direction is valid
-    //console.log("starting direction:", path_stack[0] & 0b11, path_stack[0]);
-    switch (path_stack[0] & 0b11) { // use bit mask to extract 2-bit direction
-        case 0: // left
-            if (first_col == 0) {
-                path_stack[0] &= ~(0b11); // Clear left direction
-                path_stack[0] |= 0b01; // set right diretion
-            }; // if left column, face right
-            break;
-        case 1: // right
-            if (first_col == maze.col_count-1) {
-                path_stack[0] &= ~(0b11);; // Clear right direction
-                // left is 0, no need to set anything
-            }; // if right column, face left
-            break;
-        case 2: // top
-            if (first_row == 0) {
-                path_stack[0] &= ~(0b11);; // Clear top direction
-                path_stack[0] |= 0b11; // set bot diretion
-            }; // if top row, face bot
-            break;
-        case 3: // bottom
-            if (first_row == maze.row_count-1) {
-                path_stack[0] &= ~(0b11);; // Clear bot direction
-                path_stack[0] |= 0b10; // set top diretion
-            }; // if bot row, face top
-            break;
-    }
-
     
     while (unexplored > 0) {
         // Check all directions around the maze and push valid ones into "valid"
@@ -596,53 +563,65 @@ function recur_bt_maze(maze) {
                                                        // make sure using 0 fill right shift
         const front_row = floor(front_index / maze.col_count);
         const front_col = front_index % maze.col_count;
+        const valid = new Array();
         // Make sure not to include perimeter walls
         if ( (front_col > 0) && !visited_set.contains(front_index - 1) )
-            valid.push(WallEnum.left);
+            valid.push(DirectionEnum.left);
         if ( (front_col < (maze.col_count-1)) && !visited_set.contains(front_index + 1) )
-            valid.push(WallEnum.right);
+            valid.push(DirectionEnum.right);
         if ( (front_row > 0) && !visited_set.contains(front_index - maze.col_count) )
-            valid.push(WallEnum.top);
+            valid.push(DirectionEnum.up);
         if ( (front_row < (maze.row_count-1)) && !visited_set.contains(front_index + maze.col_count) )
-            valid.push(WallEnum.bot);
-        // Shuffle all valid directions
-        for (let i = valid.length-1; i > 0; --i) {
-            const j = rand_int(0, i);
-            const temp = valid[j];
-            valid[j] = valid[i];
-            valid[i] = temp;
-        }
+            valid.push(DirectionEnum.down);
         // If there are no valid directions, pop from stack
         if (valid.length == 0) {
             --count;
-            if (count < 0) {
+            if (count == 0) {
                 console.log("out of bounds");
                 return;
             }
         } else { // Else, we must visit a new node
+
+            // See if the previous direction is still valid
+            const prev_direction = path_stack[count-2] & 0b11;
+            let found = -1;
+            for (let i = 0; i < valid.length; ++i) {
+                if (valid[i] == prev_direction) {
+                    found = i;
+                    break;
+                }
+            }
+            // If it's valid, and we pass an RNG check, then we go in the same direction again
+            if (found > -1 && random() < straightness)
+                valid[0] = valid[found];
+            // Otherwise, pick a random valid direction
+            else
+                valid[0] = valid[ rand_int(0, valid.length-1) ];
+            
             --unexplored; // Decrement unexplored nodes
             path_stack[count-1] &= ~(0b11); // Clear the direction in the current node first
             let new_cell;
+
             // Go in the first direction in our valid array
             switch (valid[0]) {
-                case WallEnum.left:
+                case DirectionEnum.left:
                     maze.vertical_wall(front_col-1, front_col, front_row, front_row, false);
-                    // Left doesn't need to set direction
+                    path_stack[count-1] |= DirectionEnum.left; // Set direction travelled as left
                     new_cell = front_index - 1; // Find the index of the cell to the left of current
                     break;
-                case WallEnum.right:
+                case DirectionEnum.right:
                     maze.vertical_wall(front_col, front_col+1, front_row, front_row, false);
-                    path_stack[count-1] |= 0b01; // Set direction travelled as right
+                    path_stack[count-1] |= DirectionEnum.right; // Set direction travelled as right
                     new_cell = front_index + 1; // Find the index of the cell to the right of current
                     break;
-                case WallEnum.top:
+                case DirectionEnum.up:
                     maze.horizontal_wall(front_col, front_col, front_row-1, front_row, false);
-                    path_stack[count-1] |= 0b10; // Set direction travelled as up
+                    path_stack[count-1] |= DirectionEnum.up; // Set direction travelled as up
                     new_cell = front_index - maze.col_count; // Find the index of the cell above current
                     break;
-                case WallEnum.bot:
+                case DirectionEnum.down:
                     maze.horizontal_wall(front_col, front_col, front_row, front_row+1, false);
-                    path_stack[count-1] |= 0b11; // Set direction travelled as down
+                    path_stack[count-1] |= DirectionEnum.down; // Set direction travelled as down
                     new_cell = front_index + maze.col_count; // Find the index of the cell below current
                     break;
             }
@@ -652,8 +631,5 @@ function recur_bt_maze(maze) {
             // Also add new_cell into set, no need to shift for this one
             visited_set.insert(new_cell);
         }
-        // Clear the valid directions
-        valid = new Array();
     }
-
 }
