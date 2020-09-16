@@ -34,7 +34,7 @@ function setup() { // P5 Setup Function
     //k_msp_maze(maze);
 
     // Use recursive backtracking to create the the maze
-    recur_bt_maze(maze);
+    recur_bt_maze(maze, 0.4);
 }
 
 /**
