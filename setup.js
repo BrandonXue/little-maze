@@ -19,6 +19,7 @@ function setup() { // P5 Setup Function
     const unit_area = 15;
     const wall_thickness = 3;
 
+
     // Calculate canvas dimensions and create canvas
     const width = (col_count * unit_area) + wall_thickness;
     const height = (row_count * unit_area) + wall_thickness;
@@ -26,6 +27,7 @@ function setup() { // P5 Setup Function
     
     // Note: Maze will try to paint the canvas, it must be instantiated after createCanvas
     var maze = new Maze(row_count, col_count, wall_thickness, unit_area);
+    const bot = new Bot(maze, "yellow"); // pacman:)
 
     // Use binary space partitioning to create the maze
     //bsp_maze(maze);
@@ -35,6 +37,9 @@ function setup() { // P5 Setup Function
 
     // Use recursive backtracking to create the the maze
     recur_bt_maze(maze, 0.4);
+
+    bot.place_bot(1,1);
+
 }
 
 /**
@@ -51,7 +56,7 @@ function draw() {  // P5 Frame Re-draw Fcn, Called for Every Frame.
     }
 }
 
-
+ 
 /**
  * The following functions have been left as stubs for testing purposes.
  * We may use them for reference in the near future.

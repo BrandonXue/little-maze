@@ -25,6 +25,8 @@ class Maze {
         this.unit_area = unit;
         this.wall_color = "white";
         this.fill_color = "black";
+        this.start_row = 0;
+        this.start_col = 0;
 
         /* The grid is an array of uint arrays. The lowest order 4 bits of the uint array
            are used to track the walls that surround that cell. The bits are LRTB,
