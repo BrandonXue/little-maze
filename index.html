@@ -12,19 +12,38 @@
     <!-- For more P5.JS, CF https://github.com/processing/p5.js/wiki -->
     <script src="p5.js"></script>    <!-- Load P5.JS, one file -->
 
-    <script src="setup.js"></script>    <!-- Load setup() draw() P5 functions -->
     <script src="utils.js"></script>    <!-- Load some utility functions and structures -->
     <script src="maze.js"></script>     <!-- Load maze class and maze generation algorithms -->
     <script src="bot.js"></script>      <!-- Bot class used to solve the maze and track the bot -->
+    <script src="setup.js"></script>    <!-- Load setup() draw() P5 functions -->
   </head>
-
-  <body>     <!-- HTML page body, where raw text gets displayed on the page -->
-    <h1>Playing the HTML canvas w P5</h1>    <!-- Text in a high priority heading -->
-    <!-- 
-    <canvas id="cs-canvas" width="400" height="400"></canvas>
-     -->
-    <p>    <!-- A paragraph 'break', to start a new paragraph -->
-    Now is the time for all good squid to come to the aid of their waters.
+  <h1>Playing the HTML canvas w P5</h1>    <!-- Text in a high priority heading -->
+  <!-- 
+  <canvas id="cs-canvas" width="400" height="400"></canvas>
+   -->
+  <p>    <!-- A paragraph 'break', to start a new paragraph -->
+  Now is the time for all good squid to come to the aid of their waters.
+  <body> <!-- HTML page body, where raw text gets displayed on the page -->
+    <div class ="parent">
+        <div class="boxes">
+              <button id="watch" class="l-side-button">Watch</button>
+              <div class="gif-placeholder"></div> 
+              <button id="play"  class="l-side-button">Play</button>
+              <div class="gif-placeholder"></div>
+              <button id="race"  class="l-side-button">Race</button>
+              <div class="gif-placeholder"></div>
+        </div>
+          <div id="canvas-div"> </div>
+        <div class="boxes">
+            <section>
+              <button class="button1">Watch</button>
+            <section>
+              <button class="button2">Play</button>
+            <section>
+              <button class="button3">Race</button>
+          </div>
+    </div>
+    <script src="menu.js"></script>
   </body>    <!-- HTML display page ends here -->
 </html>
     <!-- F12 on keyboard opens Console+Inspector+Debugger window on most Browsers. -->

@@ -27,6 +27,8 @@ class Maze {
         this.fill_color = "black";
         this.start_row = 0;
         this.start_col = 0;
+        this.end_row = 0;
+        this.end_col = 0;
 
         /* The grid is an array of uint arrays. The lowest order 4 bits of the uint array
            are used to track the walls that surround that cell. The bits are LRTB,
@@ -309,6 +311,10 @@ class Maze {
     has_bot_wall(row, col) {
         return (this.grid[row][col] & WallEnum.bot) ? true : false;
     }
+
+    is_end_position(row, col) {
+        return ( (row == this.end_row) && (col == this.end_col) );
+    }
 }          
 
 /**
@@ -331,11 +337,33 @@ function create_ent_ext(maze) {
     if (rand_int(0, 1)) { // Entrance and exit are on left and right perimeter walls
         const h1 = rand_int(0, maze.row_count-1); // Random index for hole 1
         const h2 = rand_int(0, maze.row_count-1); // Random index for hole 2
+        if (random() < 0.5) {
+            maze.start_row = h1;
+            maze.start_col = 0;
+            maze.end_row = h2;
+            maze.end_col = maze.col_count-1;
+        } else {
+            maze.start_row = h2;
+            maze.start_col = maze.col_count-1;
+            maze.end_row = h1;
+            maze.end_col = 0;
+        }
         maze.vertical_wall(-1, 0, h1, h1, false); // Left
         maze.vertical_wall(maze.col_count-1, maze.col_count, h2, h2, false); // Right
     } else { // Entrance and exit are on top and bottom perimeter walls
         const h1 = rand_int(0, maze.col_count-1); // Random index for hole 1
         const h2 = rand_int(0, maze.col_count-1); // Random index for hole 2
+        if (random() < 0.5) {
+            maze.start_row = 0;
+            maze.start_col = h1;
+            maze.end_row = maze.row_count-1;
+            maze.end_col = h2;
+        } else {
+            maze.start_row = maze.row_count-1;
+            maze.start_col = h2;
+            maze.end_row = 0;
+            maze.end_col = h1;
+        }
         maze.horizontal_wall(h1, h1, -1, 0, false);  // Top
         maze.horizontal_wall(h2, h2, maze.row_count-1, maze.row_count, false);  // Bot
     }
