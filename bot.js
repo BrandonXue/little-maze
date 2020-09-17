@@ -41,8 +41,6 @@ class Bot {
   // 
   
     draw_bot() {
-        // x has to add offset = wall_thickness * 0.5 
-        //this.row / this.col
         const x = (this.col * this.maze.unit_area) + this.maze.offset + (0.5 * this.maze.unit_area);
         const y = (this.row * this.maze.unit_area) + this.maze.offset + (0.5 * this.maze.unit_area);
         stroke("orange");
@@ -52,13 +50,12 @@ class Bot {
     }
 
     erase_bot() {
-        // x has to add offset = wall_thickness * 0.5
         const x = (this.col * this.maze.unit_area) + this.maze.offset + (0.5 * this.maze.unit_area);
         const y = (this.row * this.maze.unit_area) + this.maze.offset + (0.5 * this.maze.unit_area);
         stroke(this.maze.fill_color);
-        strokeWeight(0.07 * this.maze.unit_area);
+        strokeWeight(0.05 * this.maze.unit_area);
         fill(this.maze.fill_color);
-        circle(x, y, (this.maze.unit_area-this.maze.wall_thickness) * .7);
+        circle(x, y, (this.maze.unit_area-this.maze.wall_thickness) * 0.9);
     }
     
 

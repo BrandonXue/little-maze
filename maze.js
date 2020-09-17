@@ -17,14 +17,14 @@ class Maze {
      * @param {Number} w_weight Integer. Thickness of walls in pixels.
      * @param {Number} unit Integer. Unit area of the grid.
      */
-    constructor(rows, cols, w_weight, unit) {
+    constructor(rows, cols, w_weight, unit, w_color, bg_color) {
         this.row_count = rows;
         this.col_count = cols;
         this.wall_thickness = w_weight;
         this.offset = this.wall_thickness * 0.5;
         this.unit_area = unit;
-        this.wall_color = "white";
-        this.fill_color = "black";
+        this.wall_color = w_color;
+        this.fill_color = bg_color;
         this.start_row = 0;
         this.start_col = 0;
         this.end_row = 0;
@@ -99,11 +99,11 @@ class Maze {
      */
     draw_vertical_wall(left_col, right_col, start_row, end_row, val) {
         if (val)
-            stroke(this.wall_color);
+            maze_buff.stroke(this.wall_color);
         else
-            stroke(this.fill_color);
+            maze_buff.stroke(this.fill_color);
 
-        strokeWeight(this.wall_thickness);
+        maze_buff.strokeWeight(this.wall_thickness);
 
         // Improper arguments
         if ((left_col + 1) != right_col)
@@ -113,11 +113,13 @@ class Maze {
 
         const x = right_col * this.unit_area;
         if (val) {
-            line(x + this.offset, (start_row * this.unit_area), // x1, y1
-                 x + this.offset, ((end_row+1) * this.unit_area) + this.wall_thickness); // x2, y2
+            maze_buff.line(
+                x + this.offset, (start_row * this.unit_area), // x1, y1
+                x + this.offset, ((end_row+1) * this.unit_area) + this.wall_thickness); // x2, y2
         } else { // Shorten holes slightly
-            line(x + this.offset, (start_row * this.unit_area) + (2 * this.offset), // x1, y1
-                 x + this.offset, (end_row+1) * this.unit_area); // x2, y2
+            maze_buff.line(
+                x + this.offset, (start_row * this.unit_area) + (2 * this.offset), // x1, y1
+                x + this.offset, (end_row+1) * this.unit_area); // x2, y2
         }
     }
 
@@ -188,10 +190,10 @@ class Maze {
      */
     draw_horizontal_wall(start_col, end_col, top_row, bot_row, val) {
         if (val)
-            stroke(this.wall_color);
+            maze_buff.stroke(this.wall_color);
         else
-            stroke(this.fill_color);
-        strokeWeight(this.wall_thickness);
+            maze_buff.stroke(this.fill_color);
+        maze_buff.strokeWeight(this.wall_thickness);
 
         // Improper arguments
         if ((top_row + 1) != bot_row)
@@ -201,10 +203,12 @@ class Maze {
 
         const y = bot_row * this.unit_area;
         if (val) {
-            line((start_col * this.unit_area), y + this.offset, // x1, y1
-                 (end_col+1) * this.unit_area + this.wall_thickness, y + this.offset); // x2, y2
+            maze_buff.line(
+                (start_col * this.unit_area), y + this.offset, // x1, y1
+                (end_col+1) * this.unit_area + this.wall_thickness, y + this.offset); // x2, y2
         } else { // Shorten holes slightly
-            line((start_col * this.unit_area) + (2 * this.offset), y + this.offset, // x1, y1
+            maze_buff.line(
+                (start_col * this.unit_area) + (2 * this.offset), y + this.offset, // x1, y1
                 ((end_col+1) * this.unit_area), y + this.offset); // x2, y2
         }
     }
@@ -376,7 +380,7 @@ function create_ent_ext(maze) {
  * @param {Maze} maze A Maze object that needs to have its walls modified.
  */
 function bsp_maze(maze) {
-    strokeCap(SQUARE);
+    maze_buff.strokeCap(SQUARE);
     // Create perimeter
     create_perimeter(maze);
     // Create entrance and exit
@@ -481,7 +485,7 @@ function binary_space_partition(left_col, right_col, top_row, bot_row, hole_pref
 }
 
 function k_msp_maze(maze) {
-    strokeCap(SQUARE);
+    maze_buff.strokeCap(SQUARE);
     // Fill the entire grid with walls
     for (let i = -1; i < maze.col_count; ++i)
         maze.vertical_wall(i, i+1, 0, maze.row_count-1, true); // Left
@@ -553,7 +557,7 @@ function k_msp_maze(maze) {
 }
 
 function recur_bt_maze(maze, straightness) {
-    strokeCap(SQUARE);
+    maze_buff.strokeCap(SQUARE);
     // Fill the entire grid with walls
     for (let i = -1; i < maze.col_count; ++i)
         maze.vertical_wall(i, i+1, 0, maze.row_count-1, true); // Left
