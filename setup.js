@@ -16,11 +16,12 @@ var bot_frame_mod = 8; // Update bot position every this amount of frames.
 // Global Graphics Objects
 var canvas; // The P5 canvas object
 var maze_buff; // Graphics buffer for drawing the maze
-var bot_buff;
 
-// Global Maze Objects
+// Global Maze Related
 var maze;
 var bot;
+var row_count;
+var col_count;
 
 /**
  * Called by the P5 library when the program starts.
@@ -28,8 +29,8 @@ var bot;
  */
 function setup() { // P5 Setup Function
     frameRate(60);
-    const row_count = 40;
-    const col_count = 40;
+    row_count = 40;
+    col_count = 40;
     const unit_area = window.innerWidth * 0.5 / col_count;
     const wall_thickness = unit_area/3;
 
@@ -39,7 +40,6 @@ function setup() { // P5 Setup Function
     const height = (row_count * unit_area) + wall_thickness;
     canvas = createCanvas(width, height);
     maze_buff = createGraphics(width, height);
-    bot_buff = createGraphics(width, height);
     canvas.parent("canvas-div");
     
     // Note: Maze will try to paint the canvas, it must be instantiated after createCanvas
@@ -49,7 +49,7 @@ function setup() { // P5 Setup Function
     //bsp_maze(maze);
 
     // Use Kruskal's Algorithm with random joins to create the maze
-    k_msp_maze(maze, -1);
+    k_msp_maze(maze, 0);
 
     // Use recursive backtracking to create the the maze
     //recur_bt_maze(maze, 0.4);
@@ -65,9 +65,7 @@ function setup() { // P5 Setup Function
  * For more infor see reference: https://p5js.org/reference/#/p5/draw
  */
 function draw() {  // P5 Frame Re-draw Fcn, Called for Every Frame.
-    background(maze.fill_color);
     image(maze_buff, 0, 0);
-    image(bot_buff, 0, 0);
 
     bot.move_bot();
     bot.draw_trail();
@@ -79,6 +77,21 @@ function draw() {  // P5 Frame Re-draw Fcn, Called for Every Frame.
     }*/
 }
 
+function resize_maze() {
+    console.log("called")
+    // Recalculate the unit area and wall thickness
+    const unit_area = window.innerWidth * 0.5 / col_count;
+    maze.resize(unit_area);
+    const wall_thickness = unit_area/3;
+    const offset = 0.5 * wall_thickness;
+    maze.repaint();
+
+    // Recalculate canvas dimensions and resize canvas
+    const width = (col_count * unit_area) + wall_thickness;
+    const height = (row_count * unit_area) + wall_thickness;
+
+    resizeCanvas(width, height);
+}
  
 /**
  * The following functions have been left as stubs for testing purposes.

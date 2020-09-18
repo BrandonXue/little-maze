@@ -46,8 +46,19 @@ class Maze {
     fill_background() {
         const width = (this.col_count * this.unit_area) + this.wall_thickness;
         const height = (this.row_count * this.unit_area) + this.wall_thickness;
-        fill(this.fill_color);
-        rect(0, 0, width, height);
+        maze_buff.fill(this.fill_color);
+        maze_buff.rect(0, 0, width, height);
+    }
+
+
+    /**
+     * Resize the maze
+     * @param {Number} unit_area The number of pixels a grid cell's side length will be
+     */
+    resize(unit_area) {
+        this.unit_area = unit_area;
+        this.wall_thickness = this.unit_area / 3;
+        this.offset = 0.5 * this.wall_thickness;
     }
 
     /**
@@ -121,12 +132,13 @@ class Maze {
      * @param {Boolean} val True to draw a wall, false to draw a hole.
      */
     draw_vertical_wall(left_col, right_col, start_row, end_row, val) {
-        if (val)
+        if (val) {
             maze_buff.stroke(this.wall_color);
-        else
+            maze_buff.strokeWeight(this.wall_thickness);
+        } else {
             maze_buff.stroke(this.fill_color);
-
-        maze_buff.strokeWeight(this.wall_thickness);
+            maze_buff.strokeWeight(this.wall_thickness * 1.1);
+        }
 
         // Improper arguments
         if ((left_col + 1) != right_col)
@@ -212,11 +224,13 @@ class Maze {
      * @param {Boolean} val True to draw a wall, false to draw a hole.
      */
     draw_horizontal_wall(start_col, end_col, top_row, bot_row, val) {
-        if (val)
+        if (val) {
             maze_buff.stroke(this.wall_color);
-        else
+            maze_buff.strokeWeight(this.wall_thickness);
+        } else {
             maze_buff.stroke(this.fill_color);
-        maze_buff.strokeWeight(this.wall_thickness);
+            maze_buff.strokeWeight(this.wall_thickness * 1.1);
+        }
 
         // Improper arguments
         if ((top_row + 1) != bot_row)
