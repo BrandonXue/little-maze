@@ -85,7 +85,6 @@ class Bot {
             numerator *= 2;
         this.unit_movement = numerator / 256;
     }
-
     /**
      * Adds a trail segment to our trail stack.
      * Precondition:
@@ -106,7 +105,6 @@ class Bot {
             } else { // case 2: leaving cell with trail, going into cell without trail
                 this.maze.set_trail_bits(this.row, this.col, 0b11110000); // set a trail in current cell
                 const index = this.col + this.row * this.maze.col_count;
-                console.log(index);
                 this.trail.push(index); // push current cell to stack
                 // instead, add a tail towards new trail
             }
@@ -117,6 +115,8 @@ class Bot {
                 // erase the tail in current cell that's pointing towards the old trail piece
             } else { // case 4: leaving cell with no trail, going into cell without trail
                 this.maze.set_trail_bits(prev_row, prev_col, 0b11110000); // leave a trail in cell we just left
+                const index = this.col + this.row * this.maze.col_count;
+                this.trail.push(index);
                 // add a tail towards the current cell
             }
         }
@@ -130,7 +130,6 @@ class Bot {
 
     //passing in previous location
     draw_trail(prev_row, prev_col){
-        //console.log(this.trail.get_count());
         const stack = this.trail.route_stack;
         for (let i = 0; i < this.trail.get_count(); ++i) {
             const col = stack[i] % this.maze.col_count;
@@ -225,8 +224,6 @@ class Bot {
     }
 
     move_bot() {
-        // TODO: draw a trail
-
         // If the bot has arrived at the end, return
         if (this.maze.is_end_position(this.row, this.col))
             return;
