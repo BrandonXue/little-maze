@@ -2,17 +2,23 @@
  * Brandon Xue, Ernesto Hoogkkirk, Ryan Martinez
  * 
  * This file contains the definitions for the P5 setup() and draw().
- * (TODO: We may want to add menu functionality here)
+ * P5 uses preload() to load any resources before calling setup(),
+ * then begins calling draw() every frame.
+ * 
+ * We use multiple graphics buffer objects (created by createGraphics())
+ * to separate the different visual components of our program.
  */
 
-// Global variables used in Prof's program. May become obsolete later:
-var g_frame_cnt = 0; // Setup a P5 display-frame counter, to do anim
-var g_frame_mod = 1; // Update ever 'mod' frames.
+// Global Rendering Related
+var bot_frame_count = 0; // Use a counter to keep track of which frame we're on for bot movement
+var bot_frame_mod = 8; // Update bot position every this amount of frames.
 
-var canvas;
-var maze_buff;
+// Global Graphics Objects
+var canvas; // The P5 canvas object
+var maze_buff; // Graphics buffer for drawing the maze
 var bot_buff;
 
+// Global Maze Objects
 var maze;
 var bot;
 
@@ -38,7 +44,6 @@ function setup() { // P5 Setup Function
     
     // Note: Maze will try to paint the canvas, it must be instantiated after createCanvas
     maze = new Maze(row_count, col_count, wall_thickness, unit_area, "white", "black");
-    bot = new Bot(maze, "yellow", BotDirEnum.right); // pacman:)
 
     // Use binary space partitioning to create the maze
     bsp_maze(maze);
@@ -49,7 +54,7 @@ function setup() { // P5 Setup Function
     // Use recursive backtracking to create the the maze
     //recur_bt_maze(maze, 0.4);
 
-    bot.place_bot(maze.start_row,maze.start_col);
+    bot = new Bot(maze, maze.start_row, maze.start_col, "yellow", 5); // pacman:)
 }
 
 /**
@@ -63,11 +68,13 @@ function draw() {  // P5 Frame Re-draw Fcn, Called for Every Frame.
     background(maze.fill_color);
     image(maze_buff, 0, 0);
     image(bot_buff, 0, 0);
-    g_frame_cnt = (g_frame_cnt+1) % g_frame_mod;
-    if (0 == g_frame_cnt % g_frame_mod) {
+    bot.move_bot();
+    bot.draw_bot();
+
+    /*bot_frame_count = (bot_frame_count + 1) % bot_frame_mod; // Increment bot frames on a ring
+    if (bot_frame_count == 0) { // Every move_bot_mod frames, this is true
         bot.move_bot();
-        return;
-    }
+    }*/
 }
 
  
