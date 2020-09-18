@@ -1,3 +1,7 @@
+var resize_counter = 0;
+var resize_
+onresize
+
 function play() {
     console.log("test menu");
 }

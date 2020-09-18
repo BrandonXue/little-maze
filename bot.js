@@ -6,8 +6,7 @@ const BotDirEnum = {
 }
 Object.freeze(DirectionEnum)
 
-
-class Trail_Stack {
+class TrailStack {
     /**
      * @param {Number} total_cells Integer maximum number of cells in the grid
      */
@@ -43,21 +42,23 @@ class Trail_Stack {
     }
 }
 
-
 class Bot {
     /**
      * Initialize a bot that runs mazes by following the left-hand rule.
      * @param {Maze} maze A reference to the Maze object that the bot will run in
      * @param {String} bot_color The color of the bot
      * @param {BotDirEnum} init_direction The starting direction. Must be pointing away from exit.
-     * @param {*} move_speed An integer between 1 - 20. 20 means one tile per frame. 1 means one tile per 20 frames.
+     * @param {Number} move_speed An integer between 1 - 20. 20 means one tile per frame.
+     *      1 means one tile per 20 frames.
      */
-    constructor(maze, start_row, start_col, bot_color, move_speed) {
-        this.trail = new Trail_Stack(maze.row_count * maze.col_count);
+    constructor(maze, bot_color, move_speed) {
+        this.trail = new TrailStack(maze.row_count * maze.col_count);
 
         this.maze = maze;  // For use with 'has wall functions'
-        this.row = start_row;
-        this.col = start_col;
+        this.row = maze.start_row;
+        this.col = maze.start_col;
+        this.prev_row = this.row;
+        this.prev_col = this.col;
         this.color = bot_color;
 
         // Find initial direction
@@ -80,35 +81,69 @@ class Bot {
         // We do this because unit_movement must be rational and not have too many decimal places
         // Or the bot will never align with the grid again through addition
         let numerator = 1;
-        for (move_speed; move_speed > 0; --move_speed) {
+        for (move_speed; move_speed > 0; --move_speed)
             numerator *= 2;
-        }
         this.unit_movement = numerator / 256;
     }
 
+    /**
+     * Adds a trail segment to our trail stack.
+     * Precondition:
+     * @param {Number} prev_row 
+     * @param {Number} prev_col 
+     */
     set_trail(prev_row, prev_col){
+        const prev_trail_dat = (this.maze.grid[prev_row][prev_col]) >>> 4; 
+        const curr_trail_dat = (this.maze.grid[this.row][this.col]) >>> 4;
+        const prev_has_trail = prev_trail_dat != 0;
+        const curr_has_trail = curr_trail_dat != 0;
+
+        if (prev_has_trail) {
+            if (curr_has_trail) { // case 1: leaving cell with trail, going into cell with trail
+                this.maze.set_trail_bits(prev_row, prev_col, 0b00000000); // delete the trail from cell we just left
+                this.trail.pop();
+                // erase the tail in current cell that's pointing towards the old trail piece
+            } else { // case 2: leaving cell with trail, going into cell without trail
+                this.maze.set_trail_bits(this.row, this.col, 0b11110000); // set a trail in current cell
+                const index = this.col + this.row * this.maze.col_count;
+                console.log(index);
+                this.trail.push(index); // push current cell to stack
+                // instead, add a tail towards new trail
+            }
+        } else { // prev doesn't have trail
+            if (curr_has_trail) {// case 3: leaving cell with no trail, going into cell with trail
+                // This state is no longer reachable because we always have a trail under us
+                let x;
+                // erase the tail in current cell that's pointing towards the old trail piece
+            } else { // case 4: leaving cell with no trail, going into cell without trail
+                this.maze.set_trail_bits(prev_row, prev_col, 0b11110000); // leave a trail in cell we just left
+                // add a tail towards the current cell
+            }
+        }
+
+
+        // trail has a direction
+        // trail in each cell is just a symbol
         //let data = maze.grid[row][col];
         //if (this.trail.top())
     }
 
     //passing in previous location
-    draw_trail(prev_row, prev_col){ 
-        //maze.grid[0][0]
+    draw_trail(prev_row, prev_col){
+        //console.log(this.trail.get_count());
+        const stack = this.trail.route_stack;
+        for (let i = 0; i < this.trail.get_count(); ++i) {
+            const col = stack[i] % this.maze.col_count;
+            const row = floor(stack[i] / this.maze.col_count);
+            //console.log(row, col);
+            const x = (col * this.maze.unit_area) + this.maze.offset + (0.5 * this.maze.unit_area);
+            const y = (row * this.maze.unit_area) + this.maze.offset + (0.5 * this.maze.unit_area);
+            stroke("red");
+            strokeWeight(0.05 * this.maze.unit_area);
+            fill("red");
+            circle(x, y, (this.maze.unit_area-this.maze.wall_thickness) * .5);
+        }
     }        
-
-
-  // case 1: leaving cell with trail, going into cell with trail
-  //    delete the trail from cell we just left
-  // case 2: leaving cell with trail, going into cell without trail
-  //    don't delete the old trail
-  // case 3: leaving cell with no trail, going into cell with trail
-  //    nothing to delete
-  // case 4: leaving cell with no trail, going into cell without trail
-  //    leave a trail in cell we just left
-
-  // trail has a direction
-  // trail in each cell is just a symbol
-  // 
   
     draw_bot() {
         const x = (this.col * this.maze.unit_area) + this.maze.offset + (0.5 * this.maze.unit_area);
@@ -128,6 +163,10 @@ class Bot {
         circle(x, y, (this.maze.unit_area-this.maze.wall_thickness) * 0.9);
     }*/
     
+    /**
+     * Check if the bot is facing a wall based on its current direction.
+     * @returns True if the bot is facing a wall, false otherwise.
+     */
     is_facing_wall() {
         switch(this.direction){                             
             case BotDirEnum.left:
@@ -143,7 +182,7 @@ class Bot {
 
     /**
      * Find a valid direction for the bot to move in.
-     * @returns true if the bot is reoriented in a valid direction, false otherwise.
+     * @returns True if the bot is reoriented in a valid direction, false otherwise.
      */
     find_direction() {
         this.direction = (this.direction + 1) % 4; // CCW 90
@@ -208,12 +247,16 @@ class Bot {
                     break;
             }*/
 
+
             // When the bot isn't aligned with the grid yet, keeping moving in its current direction
             if ( (this.row != floor(this.row)) || (this.col != floor(this.col)) ) {
                 this.walk_forward();
             }
             // Otherwise, find direction and then move forward
             else {
+                this.set_trail(this.prev_row, this.prev_col);
+                this.prev_row = this.row;
+                this.prev_col = this.col;
                 this.find_direction();
                 this.walk_forward();
             }

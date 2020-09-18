@@ -30,8 +30,8 @@ function setup() { // P5 Setup Function
     frameRate(60);
     const row_count = 40;
     const col_count = 40;
-    const unit_area = 15;
-    const wall_thickness = 3;
+    const unit_area = window.innerWidth * 0.5 / col_count;
+    const wall_thickness = unit_area/3;
 
 
     // Calculate canvas dimensions and create canvas
@@ -46,15 +46,15 @@ function setup() { // P5 Setup Function
     maze = new Maze(row_count, col_count, wall_thickness, unit_area, "white", "black");
 
     // Use binary space partitioning to create the maze
-    bsp_maze(maze);
+    //bsp_maze(maze);
 
     // Use Kruskal's Algorithm with random joins to create the maze
-    //k_msp_maze(maze);
+    k_msp_maze(maze, -1);
 
     // Use recursive backtracking to create the the maze
     //recur_bt_maze(maze, 0.4);
 
-    bot = new Bot(maze, maze.start_row, maze.start_col, "yellow", 5); // pacman:)
+    bot = new Bot(maze, "yellow", 5); // pacman:)
 }
 
 /**
@@ -68,9 +68,11 @@ function draw() {  // P5 Frame Re-draw Fcn, Called for Every Frame.
     background(maze.fill_color);
     image(maze_buff, 0, 0);
     image(bot_buff, 0, 0);
-    bot.move_bot();
-    bot.draw_bot();
 
+    bot.move_bot();
+    bot.draw_trail();
+    bot.draw_bot();
+    
     /*bot_frame_count = (bot_frame_count + 1) % bot_frame_mod; // Increment bot frames on a ring
     if (bot_frame_count == 0) { // Every move_bot_mod frames, this is true
         bot.move_bot();
@@ -90,4 +92,3 @@ function draw() {  // P5 Frame Re-draw Fcn, Called for Every Frame.
 function mousePressed() {
     console.log("Detected mouse click.");
 }*/
-

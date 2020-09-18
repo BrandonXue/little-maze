@@ -86,6 +86,29 @@ class Maze {
     }
 
     /**
+     * Clears the higher order 4 bits and sets them using the provided bit mask.
+     * The bitmask passed as an argument should have 0's for the lower order 4 bis.
+     * @param {Number} row The integer row index
+     * @param {Number} col The integer column index
+     * @param {Number} mask The bit mask to be applied to the data.
+     */
+    set_trail_bits(row, col, mask) {
+        this.grid[row][col] &= 0b00001111;
+        this.grid[row][col] |= mask; //Mask should be: tttt0000
+    }
+
+    /**
+     * Sets to true any higher order 4 bits that are specified in the mask,
+     * without clearing anything first. (bitwise OR)
+     * @param {Number} row The integer row index
+     * @param {Number} col The integer column index
+     * @param {Number} mask The bit mask to be applied to the data.
+     */
+    bit_or_trail_bits(row, col, Mask) {
+        this.grid[row][col] |= mask;
+    }
+
+    /**
      * Draw a wall on the canvas, or draw a hole.
      * @param {Number} left_col The column index that is directly left of the desired wall.
      *      If you want a wall on the left perimeter, pass the imaginary column index of -1.
@@ -484,7 +507,7 @@ function binary_space_partition(left_col, right_col, top_row, bot_row, hole_pref
     }
 }
 
-function k_msp_maze(maze) {
+function k_msp_maze(maze, orientation) {
     maze_buff.strokeCap(SQUARE);
     // Fill the entire grid with walls
     for (let i = -1; i < maze.col_count; ++i)
@@ -527,8 +550,21 @@ function k_msp_maze(maze) {
     // While we have more than one set
     // Iterate over all edges and delete if possible
     while (cell_sets.num_sets > 1) {
-        const i = floor(random() * count);
-        const is_top = (edge_sequence[i] % 2) != 0;
+        let i = floor(random() * count);
+        let is_top = (edge_sequence[i] % 2) != 0;
+        if (orientation < 0) { // negative means prioritize horizontal
+            const chance = orientation * -1;
+            // If we have a top wall, reroll instead
+            if (is_top && random() < chance)
+                i = floor(random() * count);
+        } else {
+            const chance = orientation;
+            // If we have a left wall, reroll instead
+            if (!is_top && random() < chance)
+                i = floor(random() * count);
+        }
+
+        is_top = (edge_sequence[i] % 2) != 0;
         const grid_index1 = floor(edge_sequence[i] / 2);
         const grid_index2 = is_top ? grid_index1 - maze.col_count : grid_index1-1;
         const deleted = cell_sets.try_join_trees(grid_index1, grid_index2);
