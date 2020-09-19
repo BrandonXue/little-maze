@@ -426,7 +426,7 @@ function bsp_maze(maze) {
     /** Create internal walls via recursive partition **/
     // Use a random starting direction for the initial partition
     const random_dir = random() >= 0.5 ? DirectionEnum.horizontal : DirectionEnum.vertical;
-    binary_space_partition(0, maze.row_count-1, 0, maze.col_count-1, 0.5, random_dir, maze);
+    binary_space_partition(0, maze.col_count-1, 0, maze.row_count-1, 0.5, random_dir, maze);
 }
 
 /**

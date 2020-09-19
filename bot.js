@@ -60,10 +60,17 @@ class Bot {
         this.prev_row = this.row;
         this.prev_col = this.col;
         this.color = bot_color;
+        this.speed_update = false;
 
         // Find initial direction
         this.find_initial_direction();
 
+        // Speed can be an integer from 1 - 8
+        this.calc_unit_movement(move_speed);
+    }
+
+    calc_unit_movement(move_speed) {
+        this.speed_update = false;
         // Speed can be an integer from 1 - 8
         move_speed = floor(move_speed); // Make sure it's an integer
         if (move_speed < 1) // Make sure it's within bounds
@@ -77,6 +84,14 @@ class Bot {
         for (move_speed; move_speed > 0; --move_speed)
             numerator *= 2;
         this.unit_movement = numerator / 256;
+    }
+
+    /**
+     * Used to alert the bot that the global variable speed has been updated.
+     * The bot will update its speed the next time it is aligned with the grid.
+     */
+    notify_speed_update() {
+        this.speed_update = true;
     }
 
     find_initial_direction() {
@@ -274,6 +289,9 @@ class Bot {
             }
             // Otherwise, find direction and then move forward
             else {
+                // If global speed has changed, recalculate bot's unit movement
+                if (this.speed_update)
+                    this.calc_unit_movement(speed);
                 this.set_trail(this.prev_row, this.prev_col);
                 this.prev_row = this.row;
                 this.prev_col = this.col;

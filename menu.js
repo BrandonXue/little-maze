@@ -1,9 +1,9 @@
 const resize_timeout_duration = 250;
 const bot_reset_timeout_duration = 500;
-const text_timeout_duration = 100;
+const speed_input_timeout = 100;
 var resize_timeout; // variable used to store the timer
 var bot_reset_timeout;
-var text_input_timeout;
+var speed_input_timer;
 var can_generate;
 
 function resize_maze() {
@@ -135,15 +135,23 @@ document.getElementById("cols-input").addEventListener("input", col_input_update
 function speed_input_update() {
     const speed_input = document.getElementById("speed-input").value;
     if (!isNaN(speed_input)) {
+        if (speed_input == "")
+            return;
         let speed_input_int = parseInt(speed_input, 10);
         if (speed_input_int < 1)
-            speed_input_int = 1;
+            return;
         if (speed_input_int > 8)
             speed_input_int = 8;
         speed = speed_input_int;
+        bot.notify_speed_update();
     }
 }
-document.getElementById("speed-input").addEventListener("input", speed_input_update);
+function speed_text_changed() {
+    console.log("using debounce")
+    clearTimeout(speed_input_timer);
+    speed_input_timer = setTimeout(speed_input_update, speed_input_timeout);
+}
+document.getElementById("speed-input").addEventListener("input", speed_text_changed);
 
 function play_button_click() {
     if (not_generating)
