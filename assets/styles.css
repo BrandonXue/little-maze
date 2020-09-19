@@ -136,9 +136,24 @@ body {
 .gen-maze-op-row {
     font: small-caps bold 24px/1 sans-serif;
     font-size: 1.2vw;
+    float: right;
+}
+
+.maze-ctrl-row {
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: space-evenly;
+}
+
+.ctrl-button {
+    cursor: pointer;
+    border-radius: 25%;
+    border: 0.4vw solid black;
+}
+
+.ctrl-button:hover {
+    background-color: rgb(215, 246, 255);
 }
 
 #canvas-div {
@@ -155,4 +170,9 @@ body {
 
 #shrek {
     width: 100px;
+}
+
+.test{
+    width: 2vw;
+    height: 2vw;
 }

@@ -14,7 +14,7 @@
     <script src="utils.js"></script>    <!-- Load some utility functions and structures -->
     <script src="maze.js"></script>     <!-- Load maze class and maze generation algorithms -->
     <script src="bot.js"></script>      <!-- Bot class used to solve the maze and track the bot -->
-    <script src="setup.js"></script>    <!-- Load setup() draw() P5 functions -->
+    <script src="main.js"></script>    <!-- Load setup() draw() P5 functions -->
   </head>
   <body> <!-- HTML page body, where raw text gets displayed on the page -->
     <div class="site-wrapper">
@@ -23,7 +23,7 @@
         <div class="main-side-panel">
           <button id="watch" class="l-side-button">Watch</button>
           <div class="gif-placeholder"></div> 
-          <button id="play"  class="l-side-button">Play</button>
+          <button id="play-mode"  class="l-side-button">Play</button>
           <div class="gif-placeholder"></div>
           <button id="race"  class="l-side-button">Race</button>
           <div class="gif-placeholder"></div>
@@ -57,7 +57,17 @@
           <div class="box-label">Maze Controls</div>
           <div class="options-pane-outer">
             <div class="options-pane-inner">
-
+              <div class ="maze-ctrl-row">
+                <button id="play-button" class="ctrl-button">
+                  <img id="play" class="test" src="assets/play-button.svg" alt="">
+                </button>
+                <button id="pause-button" class="ctrl-button">
+                  <img id="play" class="test" src="assets/pause-button.svg" alt="">
+                </button>
+                <button id="reset-button" class="ctrl-button">
+                  <img id="play" class="test" src="assets/reset.svg" alt="">
+                </button>
+              </div>
             </div>
           </div>
           <button id="return-to-main">Return to Main Menu</button>
@@ -90,7 +100,7 @@
       <p>    <!-- A paragraph 'break', to start a new paragraph -->
         By team Farquads: Brandon Xue, Ernesto Hooghkirk, Ryan Martinez
       </p>
-      <img id="shrek" src="assets/yess.svg" alt="">
+      <img id="shrek" src="assets/all_star.svg" alt="">
       <script src="menu.js"></script>
     </div>
   </body>    <!-- HTML display page ends here -->

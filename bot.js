@@ -62,14 +62,7 @@ class Bot {
         this.color = bot_color;
 
         // Find initial direction
-        if (this.row == 0)
-            this.direction = BotDirEnum.down;
-        else if (this.row == maze.row_count-1)
-            this.direction = BotDirEnum.up;
-        else if (this.col == 0)
-            this.direction = BotDirEnum.right;
-        else if (this.col == maze.col_count-1)
-            this.direction = BotDirEnum.left;
+        this.find_initial_direction();
 
         // Speed can be an integer from 1 - 8
         move_speed = floor(move_speed); // Make sure it's an integer
@@ -85,6 +78,18 @@ class Bot {
             numerator *= 2;
         this.unit_movement = numerator / 256;
     }
+
+    find_initial_direction() {
+        if (this.row == 0)
+            this.direction = BotDirEnum.down;
+        else if (this.row == maze.row_count-1)
+            this.direction = BotDirEnum.up;
+        else if (this.col == 0)
+            this.direction = BotDirEnum.right;
+        else if (this.col == maze.col_count-1)
+            this.direction = BotDirEnum.left;
+    }
+
     /**
      * Adds a trail segment to our trail stack.
      * Precondition:
@@ -142,7 +147,25 @@ class Bot {
             fill("red");
             circle(x, y, (this.maze.unit_area-this.maze.wall_thickness) * .5);
         }
-    }        
+    } 
+    
+    reset() {
+        // Clear all path data by using the path stack
+        while (this.trail.get_count() > 0) {
+            const index = this.trail.pop();
+            const col = index % this.maze.col_count;
+            const row = floor(index / this.maze.col_count);
+            this.maze.set_trail_bits(row, col, 0b00000000);
+        }
+        // Clear path stack
+        //this.trail = new TrailStack(this.maze.row_count * this.maze.col_count);
+        // Get starting position + direction 
+        this.row = this.maze.start_row;
+        this.col = this.maze.start_col;
+        this.prev_row = this.row;
+        this.prev_col = this.col;
+        this.find_initial_direction();
+    }
   
     draw_bot() {
         const x = (this.col * this.maze.unit_area) + this.maze.offset + (0.5 * this.maze.unit_area);

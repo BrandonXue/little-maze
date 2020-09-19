@@ -25,6 +25,8 @@ var bot_may_move;
 var game_running;
 
 // Variables
+var new_row_count;
+var new_col_count;
 var row_count;
 var col_count;
 var wall_color;
@@ -38,8 +40,8 @@ var speed;
  */
 function setup() { // P5 Setup Function
     frameRate(60);
-    row_count = 40;
-    col_count = 40;
+    new_row_count = row_count = 40;
+    new_col_count = col_count = 40;
     wall_color = "white";
     background_color = "black";
     speed = 5;
