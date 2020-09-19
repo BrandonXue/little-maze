@@ -1,8 +1,8 @@
-const resize_timeout_duration = 250;
-const bot_reset_timeout_duration = 500;
+const window_resize_timeout = 250;
+const bot_reset_timeout = 500;
 const speed_input_timeout = 100;
-var resize_timeout; // variable used to store the timer
-var bot_reset_timeout;
+var window_resize_timer; // variable used to store the timer
+var bot_reset_timer;
 var speed_input_timer;
 var can_generate;
 
@@ -26,9 +26,9 @@ function resize_maze() {
 window.addEventListener('resize', function() { // Whenever window resizes
     // Clear the previous timer, preventing it from executing the function
     // that it was supposed to execute after the delay has elapsed.
-    clearTimeout(resize_timeout);
+    clearTimeout(window_resize_timer);
     // Then set another new timer with the same delay
-    resize_timeout = setTimeout(resize_maze, resize_timeout_duration);
+    window_resize_timer = setTimeout(resize_maze, window_resize_timeout);
     // In effect, only the last resize event within 400ms
     // will call the resize_maze function
 });
@@ -80,8 +80,8 @@ function select_bsp_maze() {
     bot = null;
     generate_maze("bsp");
     bot = new Bot(maze, "yellow", speed);
-    clearTimeout(bot_reset_timeout);
-    bot_reset_timeout = setTimeout(enable_bot_movement, bot_reset_timeout_duration);
+    clearTimeout(bot_reset_timer);
+    bot_reset_timer = setTimeout(enable_bot_movement, bot_reset_timeout);
 }
 document.getElementById("binary-space-partition").addEventListener("click", select_bsp_maze);
 
@@ -91,8 +91,8 @@ function select_k_mst_maze() {
     bot = null;
     generate_maze("k_msp");
     bot = new Bot(maze, "yellow", speed);
-    clearTimeout(bot_reset_timeout);
-    bot_reset_timeout = setTimeout(enable_bot_movement, bot_reset_timeout_duration);
+    clearTimeout(bot_reset_timer);
+    bot_reset_timer = setTimeout(enable_bot_movement, bot_reset_timeout);
 }
 document.getElementById("kruskals-mst-merge").addEventListener("click", select_k_mst_maze);
 
@@ -101,8 +101,8 @@ function select_recur_bt_maze() {
     game_running = false;
     generate_maze("recur_bt");
     bot = new Bot(maze, "yellow", speed);
-    clearTimeout(bot_reset_timeout);
-    bot_reset_timeout = setTimeout(enable_bot_movement, bot_reset_timeout_duration);
+    clearTimeout(bot_reset_timer);
+    bot_reset_timer = setTimeout(enable_bot_movement, bot_reset_timeout);
 }
 document.getElementById("recursive-backtracking").addEventListener("click", select_recur_bt_maze);
 
@@ -171,7 +171,7 @@ function reset_button_click() {
     bot_may_move = false; // disable bot movement
     bot.reset();
     // Timeout before renabling movement
-    clearTimeout(bot_reset_timeout);
-    bot_reset_timeout = setTimeout(enable_bot_movement, bot_reset_timeout_duration);
+    clearTimeout(bot_reset_timer);
+    bot_reset_timer = setTimeout(enable_bot_movement, bot_reset_timeout);
 }
 document.getElementById("reset-button").addEventListener("click", reset_button_click);
