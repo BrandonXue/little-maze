@@ -20,8 +20,17 @@ var maze_buff; // Graphics buffer for drawing the maze
 // Global Maze Related
 var maze;
 var bot;
+var not_generating; // flag to disable drawing while maze generates
+var bot_may_move;
+var game_running;
+
+// Variables
 var row_count;
 var col_count;
+var wall_color;
+var background_color;
+var speed;
+
 
 /**
  * Called by the P5 library when the program starts.
@@ -31,30 +40,28 @@ function setup() { // P5 Setup Function
     frameRate(60);
     row_count = 40;
     col_count = 40;
+    wall_color = "white";
+    background_color = "black";
+    speed = 5;
+    bot_may_move = true;
     const unit_area = window.innerWidth * 0.5 / col_count;
-    const wall_thickness = unit_area/3;
-
+    const wall_thickness = unit_area/4;
 
     // Calculate canvas dimensions and create canvas
     const width = (col_count * unit_area) + wall_thickness;
     const height = (row_count * unit_area) + wall_thickness;
     canvas = createCanvas(width, height);
-    maze_buff = createGraphics(width, height);
     canvas.parent("canvas-div");
+    maze_buff = createGraphics(width, height);
     
     // Note: Maze will try to paint the canvas, it must be instantiated after createCanvas
-    maze = new Maze(row_count, col_count, wall_thickness, unit_area, "white", "black");
+    //maze = new Maze(row_count, col_count, unit_area, wall_color, background_color);
 
-    // Use binary space partitioning to create the maze
-    //bsp_maze(maze);
+    // Use binary space partitioning as the default first maze 
+    select_bsp_maze();
 
-    // Use Kruskal's Algorithm with random joins to create the maze
-    k_msp_maze(maze, 0);
-
-    // Use recursive backtracking to create the the maze
-    //recur_bt_maze(maze, 0.4);
-
-    bot = new Bot(maze, "yellow", 5); // pacman:)
+    bot = new Bot(maze, "yellow", speed); // pacman:)
+    game_running = true;
 }
 
 /**
@@ -65,43 +72,24 @@ function setup() { // P5 Setup Function
  * For more infor see reference: https://p5js.org/reference/#/p5/draw
  */
 function draw() {  // P5 Frame Re-draw Fcn, Called for Every Frame.
-    image(maze_buff, 0, 0);
+    // Override Priority high to low:
+    // Make sure maze isn't generating
+        // If all above are true, render maze
+        // If all above are true, render bot and trail
+    // Make sure bot may move -- this flag is used by the maze generator
+    // Make sure game isn't stopped -- this flag is controlled by the user
+        // If all above are true, move bot
 
-    bot.move_bot();
-    bot.draw_trail();
-    bot.draw_bot();
-    
-    /*bot_frame_count = (bot_frame_count + 1) % bot_frame_mod; // Increment bot frames on a ring
-    if (bot_frame_count == 0) { // Every move_bot_mod frames, this is true
-        bot.move_bot();
-    }*/
+    // Render order:
+    // Maze first
+    // Trail second
+    // Bot third
+
+    if (not_generating) {
+        image(maze_buff, 0, 0); // Paint the maze
+        if (game_running && bot_may_move)
+            bot.move_bot(); // Move the bot
+        bot.draw_trail(); // Draw the path that the bot has set
+        bot.draw_bot(); // Draw the bot itself
+    }
 }
-
-function resize_maze() {
-    console.log("called")
-    // Recalculate the unit area and wall thickness
-    const unit_area = window.innerWidth * 0.5 / col_count;
-    maze.resize(unit_area);
-    const wall_thickness = unit_area/3;
-    const offset = 0.5 * wall_thickness;
-    maze.repaint();
-
-    // Recalculate canvas dimensions and resize canvas
-    const width = (col_count * unit_area) + wall_thickness;
-    const height = (row_count * unit_area) + wall_thickness;
-
-    resizeCanvas(width, height);
-}
- 
-/**
- * The following functions have been left as stubs for testing purposes.
- * We may use them for reference in the near future.
- */
-
-/*function keyPressed() {
-    console.log("Detected key press.");
-}*
-
-function mousePressed() {
-    console.log("Detected mouse click.");
-}*/

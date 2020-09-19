@@ -18,10 +18,7 @@
   </head>
   <body> <!-- HTML page body, where raw text gets displayed on the page -->
     <div class="site-wrapper">
-      <h1>Playing the HTML canvas w P5</h1>    <!-- Text in a high priority heading -->
-      <p>    <!-- A paragraph 'break', to start a new paragraph -->
-      Now is the time for all good squid to come to the aid of their waters.
-      </p>
+      <h1 id="title">Little Maze</h1>    <!-- Text in a high priority heading -->
       <div class ="parent">
         <div class="main-side-panel">
           <button id="watch" class="l-side-button">Watch</button>
@@ -32,29 +29,67 @@
           <div class="gif-placeholder"></div>
         </div>
         <div class="side-panel">
-          <div id="custom-maze-options" class="box-label">Custom Maze Options</div>
-          <div class="options-pane">
-            <!--our sliders and stuff go here-->
+          <div class="box-label-top">Custom Maze Options</div>
+          <div class="options-pane-outer">
+            <div class="options-pane-inner">
+              <button id="binary-space-partition" class="maze-alg-button">Binary Space Partition</button>
+              <button id="kruskals-mst-merge" class="maze-alg-button">Kruskal's MST Merge</button>
+              <button id="recursive-backtracking" class="maze-alg-button">Recursive Backtracking</button>
+            </div>
           </div>
-          <div id="general-maze-options" class="box-label">General Maze Options</div>
-          <div class="options-pane">
+          <div class="box-label">General Maze Options</div>
+          <div class="options-pane-outer">
+            <div class="options-pane-inner">
+              <div class="gen-maze-op-row">
+                Rows:
+                <input type="text" id="rows-input" value="40">
+              </div>
+              <div class="gen-maze-op-row">
+                Columns:
+                <input type="text" id="cols-input" value="40">
+              </div>
+              <div class="gen-maze-op-row">
+                Speed:
+                <input type="text" id="speed-input" value="5">
+              </div>
+            </div>
+          </div>
+          <div class="box-label">Maze Controls</div>
+          <div class="options-pane-outer">
+            <div class="options-pane-inner">
 
+            </div>
           </div>
-          <div id="maze-controls" class="box-label">Maze Controls</div>
-          <div class="options-pane">
-            <!-- Maze controls go here-->
-          </div>
-          <button id="return-to-main" class="box-label">Return to Main Menu</button>
+          <button id="return-to-main">Return to Main Menu</button>
         </div>
 
         <div id="canvas-div"> </div> <!-- Our p5 canvas goes inside this div -->
 
         <div class="side-panel">
-          <button class="button1">Watch</button>
-          <button class="button2">Play</button>
-          <button class="button3">Race</button>
+          <div class="box-label-top">Bot</div>
+            <div class="options-pane-outer">
+              <div class="options-pane-inner">
+
+              </div>
+            </div>
+          <div class="box-label">Maze</div>
+          <div class="options-pane-outer">
+            <div class="options-pane-inner">
+
+            </div>
+          </div>
+          <div class="box-label">Player</div>
+          <div class="options-pane-outer">
+            <div class="options-pane-inner">
+
+            </div>
+          </div>
+          <div id="bottom-right-label"></div>
         </div>
       </div>
+      <p>    <!-- A paragraph 'break', to start a new paragraph -->
+        By team Farquads: Brandon Xue, Ernesto Hooghkirk, Ryan Martinez
+      </p>
       <img id="shrek" src="assets/yess.svg" alt="">
       <script src="menu.js"></script>
     </div>

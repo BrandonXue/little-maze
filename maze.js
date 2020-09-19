@@ -17,12 +17,12 @@ class Maze {
      * @param {Number} w_weight Integer. Thickness of walls in pixels.
      * @param {Number} unit Integer. Unit area of the grid.
      */
-    constructor(rows, cols, w_weight, unit, w_color, bg_color) {
+    constructor(rows, cols, unit, w_color, bg_color) {
         this.row_count = rows;
         this.col_count = cols;
-        this.wall_thickness = w_weight;
-        this.offset = this.wall_thickness * 0.5;
         this.unit_area = unit;
+        this.wall_thickness = unit / 4;
+        this.offset = this.wall_thickness * 0.5;
         this.wall_color = w_color;
         this.fill_color = bg_color;
         this.start_row = 0;
@@ -47,7 +47,7 @@ class Maze {
         const width = (this.col_count * this.unit_area) + this.wall_thickness;
         const height = (this.row_count * this.unit_area) + this.wall_thickness;
         maze_buff.fill(this.fill_color);
-        maze_buff.rect(0, 0, width, height);
+        maze_buff.background(this.fill_color);
     }
 
 
@@ -57,7 +57,7 @@ class Maze {
      */
     resize(unit_area) {
         this.unit_area = unit_area;
-        this.wall_thickness = this.unit_area / 3;
+        this.wall_thickness = this.unit_area / 4;
         this.offset = 0.5 * this.wall_thickness;
     }
 
@@ -66,6 +66,7 @@ class Maze {
      * This can be used when colors have been changed.
      */
     repaint() {
+        maze_buff.strokeCap(SQUARE);
         this.fill_background();
         // Go over all cells in the grid and repaint their left and top walls
         for (let row = 0; row < this.row_count; ++row) {
@@ -137,7 +138,7 @@ class Maze {
             maze_buff.strokeWeight(this.wall_thickness);
         } else {
             maze_buff.stroke(this.fill_color);
-            maze_buff.strokeWeight(this.wall_thickness * 1.1);
+            maze_buff.strokeWeight(this.wall_thickness + 1);
         }
 
         // Improper arguments
@@ -151,9 +152,9 @@ class Maze {
             maze_buff.line(
                 x + this.offset, (start_row * this.unit_area), // x1, y1
                 x + this.offset, ((end_row+1) * this.unit_area) + this.wall_thickness); // x2, y2
-        } else { // Shorten holes slightly
+        } else { // Shorten holes slightly (vertical)
             maze_buff.line(
-                x + this.offset, (start_row * this.unit_area) + (2 * this.offset), // x1, y1
+                x + this.offset, (start_row * this.unit_area) + this.wall_thickness, // x1, y1
                 x + this.offset, (end_row+1) * this.unit_area); // x2, y2
         }
     }
@@ -229,7 +230,7 @@ class Maze {
             maze_buff.strokeWeight(this.wall_thickness);
         } else {
             maze_buff.stroke(this.fill_color);
-            maze_buff.strokeWeight(this.wall_thickness * 1.1);
+            maze_buff.strokeWeight(this.wall_thickness + 1);
         }
 
         // Improper arguments
@@ -245,7 +246,7 @@ class Maze {
                 (end_col+1) * this.unit_area + this.wall_thickness, y + this.offset); // x2, y2
         } else { // Shorten holes slightly
             maze_buff.line(
-                (start_col * this.unit_area) + (2 * this.offset), y + this.offset, // x1, y1
+                (start_col * this.unit_area) + this.wall_thickness, y + this.offset, // x1, y1
                 ((end_col+1) * this.unit_area), y + this.offset); // x2, y2
         }
     }
@@ -521,7 +522,7 @@ function binary_space_partition(left_col, right_col, top_row, bot_row, hole_pref
     }
 }
 
-function k_msp_maze(maze, orientation) {
+function k_mst_maze(maze, orientation) {
     maze_buff.strokeCap(SQUARE);
     // Fill the entire grid with walls
     for (let i = -1; i < maze.col_count; ++i)
