@@ -1,3 +1,7 @@
+*:focus{
+    outline: none;
+}
+
 #title {
     font-size: 4vw;
 }
@@ -11,6 +15,17 @@ body {
 
 .site-wrapper {
     display: flex;
+    flex-direction: column;
+    background-color: white;
+    align-items: center;
+    position: relative;
+    overflow-x: hidden;
+    width: 100%;
+}
+
+.site-wrapper-update {
+    display: flex;
+    background-color: lime;
     flex-direction: column;
     align-items: center;
     position: relative;
@@ -68,6 +83,7 @@ body {
     height: 49vw;
     border: 0.6vw solid black;
     position: relative;
+    padding: 0px;
 }
 
 .box-label-top {
@@ -75,11 +91,13 @@ body {
     font-size: 1.7vw;
     text-align: center;
     border-bottom: 0.6vw solid black;
+    background-color: white;
     width: 100%;
     height: 7%;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 0px;
 }
 
 .box-label {
@@ -88,11 +106,13 @@ body {
     text-align: center;
     border-top: 0.6vw solid black;
     border-bottom: 0.6vw solid black;
+    background-color: white;
     height: 7%;
     width: 100%;
     display: flex;
     align-items: center;
     justify-content: center;
+    padding: 0px;
 }
 
 #return-to-main {
@@ -106,6 +126,10 @@ body {
     cursor: pointer;
 }
 
+#return-to-main:hover {
+    background-color: rgb(215, 246, 255);
+}
+
 #bottom-right-label {
     font: small-caps bold 24px/1 sans-serif;
     font-size: 1.2vw;
@@ -113,14 +137,18 @@ body {
     border-top: 0.3vw solid black;
     width: 100%;
     height: 7%;
+    background-color: white;
+    padding: 0;
 }
 
 .options-pane-outer {
+    background-color: white;
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 100%;
     height: 24%;
+    padding: 0px;
 }
 
 .options-pane-inner {
@@ -131,6 +159,7 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
+    align-items: center;
 }
 
 .gen-maze-op-row {
@@ -168,11 +197,28 @@ body {
     background-color: black;
 }
 
-#shrek {
-    width: 100px;
+#dlc {
+    cursor: pointer;
+    width: 8vw;
 }
 
-.test{
+#shrek {
+    width: 7vw;
+}
+
+.maze-alg-button {
+    border: 0.4vw solid black;
+    border-radius: 25%;
+    width: 80%;
+    cursor: pointer;
+    outline: none;
+}
+
+.maze-alg-button:hover {
+    background-color: rgb(215, 246, 255);
+}
+
+.button-inner{
     width: 2vw;
     height: 2vw;
 }

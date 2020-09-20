@@ -131,6 +131,8 @@ function box_muller_int(min, max) {
     return n;
 }
 
+var debug_var;
+
 /**
  * A Disjoint Set data structure specifically for checking
  * for intersection and merging sets.
@@ -147,13 +149,16 @@ class DisjointSet {
             this.sets = new Array(starting_sets);
         }
         this.num_sets = starting_sets;
-
         for (let i = 0; i < this.sets.length; ++i) {
             this.sets[i] = 0;
         }
     }
 
     get_update_root(set_index) {
+        if (this.sets[set_index] == undefined) {
+            console.log("this.sets[set_index] was undefined for set_index ", set_index);
+            return 1;
+        }
         //console.log(set_index);
         if (this.sets[set_index] == 0) // The current node is the root of its tree
             return set_index;
@@ -168,8 +173,13 @@ class DisjointSet {
     try_join_trees(index1, index2) {
         const root1 = this.get_update_root(index1);
         const root2 = this.get_update_root(index2);
+
+        // debug
+        //const total_cells = 
+        // end debug
+
         // If both nodes are already part of the same tree, return false
-        if (root1 == root2)
+        if(root1 == root2)
             return false;
         // Else, make tree 2's root point to tree 1's root
         this.sets[root2] = root1;

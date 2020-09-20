@@ -44,6 +44,7 @@ function setup() { // P5 Setup Function
     new_col_count = col_count = 40;
     wall_color = "white";
     background_color = "black";
+    trail_color = "red";
     speed = 5;
     bot_may_move = true;
     const unit_area = window.innerWidth * 0.5 / col_count;
@@ -62,7 +63,7 @@ function setup() { // P5 Setup Function
     // Use binary space partitioning as the default first maze 
     select_bsp_maze();
 
-    bot = new Bot(maze, "yellow", speed); // pacman:)
+    //bot = new Bot(maze, "yellow", speed); // pacman:)
     game_running = true;
 }
 
@@ -93,5 +94,6 @@ function draw() {  // P5 Frame Re-draw Fcn, Called for Every Frame.
             bot.move_bot(); // Move the bot
         bot.draw_trail(); // Draw the path that the bot has set
         bot.draw_bot(); // Draw the bot itself
+        //console.log(bot.color);
     }
 }

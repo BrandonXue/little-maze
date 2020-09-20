@@ -95,14 +95,7 @@ class Bot {
     }
 
     find_initial_direction() {
-        if (this.row == 0)
-            this.direction = BotDirEnum.down;
-        else if (this.row == maze.row_count-1)
-            this.direction = BotDirEnum.up;
-        else if (this.col == 0)
-            this.direction = BotDirEnum.right;
-        else if (this.col == maze.col_count-1)
-            this.direction = BotDirEnum.left;
+        this.direction = maze.start_dir;
     }
 
     /**
@@ -110,7 +103,7 @@ class Bot {
      * Precondition:
      * @param {Number} prev_row 
      * @param {Number} prev_col 
-     */
+     */ 
     set_trail(prev_row, prev_col){
         const prev_trail_dat = (this.maze.grid[prev_row][prev_col]) >>> 4; 
         const curr_trail_dat = (this.maze.grid[this.row][this.col]) >>> 4;
@@ -157,9 +150,9 @@ class Bot {
             //console.log(row, col);
             const x = (col * this.maze.unit_area) + this.maze.offset + (0.5 * this.maze.unit_area);
             const y = (row * this.maze.unit_area) + this.maze.offset + (0.5 * this.maze.unit_area);
-            stroke("red");
+            stroke(trail_color);
             strokeWeight(0.05 * this.maze.unit_area);
-            fill("red");
+            fill(trail_color);
             circle(x, y, (this.maze.unit_area-this.maze.wall_thickness) * .5);
         }
     } 
@@ -185,20 +178,13 @@ class Bot {
     draw_bot() {
         const x = (this.col * this.maze.unit_area) + this.maze.offset + (0.5 * this.maze.unit_area);
         const y = (this.row * this.maze.unit_area) + this.maze.offset + (0.5 * this.maze.unit_area);
-        stroke("orange");
+        stroke("clear"); // workaround for p5 bug where color doesn't change
+        fill("clear"); // unless it is set to something different
         strokeWeight(0.05 * this.maze.unit_area);
+        stroke("orange");
         fill(this.color);
         circle(x, y, (this.maze.unit_area-this.maze.wall_thickness) * .7);
     }
-
-    /*erase_bot() {
-        const x = (this.col * this.maze.unit_area) + this.maze.offset + (0.5 * this.maze.unit_area);
-        const y = (this.row * this.maze.unit_area) + this.maze.offset + (0.5 * this.maze.unit_area);
-        stroke(this.maze.fill_color);
-        strokeWeight(0.05 * this.maze.unit_area);
-        fill(this.maze.fill_color);
-        circle(x, y, (this.maze.unit_area-this.maze.wall_thickness) * 0.9);
-    }*/
     
     /**
      * Check if the bot is facing a wall based on its current direction.
@@ -266,74 +252,20 @@ class Bot {
         if (this.maze.is_end_position(this.row, this.col))
             return;
 
-        /*for (let i = 0; i <=3; i++){
-            switch(i){        //  ccw +1    cw  -1
-                case 0: // first check
-                    this.direction = (this.direction + 1) % 4; // CCW 90
-                    break;
-                case 1: // second check
-                    this.direction = (this.direction + 3) % 4; // CCW 270
-                    break;
-                case 2: // third check
-                    this.direction = (this.direction + 3) % 4; // CCW 270
-                    break;
-                case 3: // fourth check
-                    this.direction = (this.direction + 3) % 4; // CCW 270
-                    break;
-            }*/
-
-
-            // When the bot isn't aligned with the grid yet, keeping moving in its current direction
-            if ( (this.row != floor(this.row)) || (this.col != floor(this.col)) ) {
-                this.walk_forward();
-            }
-            // Otherwise, find direction and then move forward
-            else {
-                // If global speed has changed, recalculate bot's unit movement
-                if (this.speed_update)
-                    this.calc_unit_movement(speed);
-                this.set_trail(this.prev_row, this.prev_col);
-                this.prev_row = this.row;
-                this.prev_col = this.col;
-                this.find_direction();
-                this.walk_forward();
-            }
-            /*switch(this.direction){                             
-                case BotDirEnum.left:
-                    if (!(this.maze.has_left_wall(this.row, this.col)) && this.col > 0) {
-                        this.col --;
-                        return;
-                    }
-                    break;
-                case BotDirEnum.right:
-                    if (!(this.maze.has_right_wall(this.row, this.col)) && this.col < this.maze.col_count-1) {
-                        this.col ++;
-                        return;
-                    }
-                    break;
-                case BotDirEnum.up:
-                    if (!(this.maze.has_top_wall(this.row, this.col)) && this.row > 0) {
-                        this.row --;
-                        return;                                        
-                    }
-                    break;
-                case BotDirEnum.down:
-                    if (!(this.maze.has_bot_wall(this.row, this.col)) && this.row < this.maze.row_count-1) {
-                        this.row ++;
-                        return;
-                    }
-                    break;
-            }
-            }
-        }*/
-    }
-    
-    /*place_bot(row, col) { // Places the bot on the board in starting location
-        // Check if position is valid in maze
-        if (row < 0 || row >= this.maze.row_count || col < 0 || col >= this.maze.col_count){
-            return -1;
+        // When the bot isn't aligned with the grid yet, keeping moving in its current direction
+        if ( (this.row != floor(this.row)) || (this.col != floor(this.col)) ) {
+            this.walk_forward();
         }
-        this.row = row;
-        this.col = col;
-    }*/
+        // Otherwise, find direction and then move forward
+        else {
+            // If global speed has changed, recalculate bot's unit movement
+            if (this.speed_update)
+                this.calc_unit_movement(speed);
+            this.set_trail(this.prev_row, this.prev_col);
+            this.prev_row = this.row;
+            this.prev_col = this.col;
+            this.find_direction();
+            this.walk_forward();
+        }
+    }
 }

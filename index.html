@@ -17,7 +17,7 @@
     <script src="main.js"></script>    <!-- Load setup() draw() P5 functions -->
   </head>
   <body> <!-- HTML page body, where raw text gets displayed on the page -->
-    <div class="site-wrapper">
+    <div id="site-wrapper-div" class="site-wrapper">
       <h1 id="title">Little Maze</h1>    <!-- Text in a high priority heading -->
       <div class ="parent">
         <div class="main-side-panel">
@@ -59,13 +59,13 @@
             <div class="options-pane-inner">
               <div class ="maze-ctrl-row">
                 <button id="play-button" class="ctrl-button">
-                  <img id="play" class="test" src="assets/play-button.svg" alt="">
+                  <img id="play" class="button-inner" src="assets/play-button.svg" alt="">
                 </button>
                 <button id="pause-button" class="ctrl-button">
-                  <img id="play" class="test" src="assets/pause-button.svg" alt="">
+                  <img id="play" class="button-inner" src="assets/pause-button.svg" alt="">
                 </button>
                 <button id="reset-button" class="ctrl-button">
-                  <img id="play" class="test" src="assets/reset.svg" alt="">
+                  <img id="play" class="button-inner" src="assets/reset.svg" alt="">
                 </button>
               </div>
             </div>
@@ -76,22 +76,32 @@
         <div id="canvas-div"> </div> <!-- Our p5 canvas goes inside this div -->
 
         <div class="side-panel">
-          <div class="box-label-top">Custom Maze Options</div>
+          <div class="box-label-top">Generate Maze</div>
             <div class="options-pane-outer">
               <div class="options-pane-inner">
-
+                
               </div>
             </div>
-          <div class="box-label">General Maze Options</div>
+          <div class="box-label">Maze Options</div>
           <div class="options-pane-outer">
             <div class="options-pane-inner">
-              
+              <div class="gen-maze-op-row">
+                Rows: Valid Inputs (5-100)
+              </div>
+              <div class="gen-maze-op-row">
+                Columns: Valid Inputs (5-100)
+              </div>
+              <div class="gen-maze-op-row">
+                Speed: Valid Inputs (1-8)
+              </div>
             </div>
           </div>
-          <div class="box-label">Maze Controls</div>
+          <div class="box-label">temp text</div>
           <div class="options-pane-outer">
             <div class="options-pane-inner">
-
+              <div class="gen-maze-op-row">
+               test
+              </div>
             </div>
           </div>
           <div id="bottom-right-label"></div>
@@ -100,7 +110,9 @@
       <p>    <!-- A paragraph 'break', to start a new paragraph -->
         By team Farquads: Brandon Xue, Ernesto Hooghkirk, Ryan Martinez
       </p>
-      <img id="shrek" src="assets/all_star.svg" alt="">
+      <button id = "dlc" ><!--//class = "dlc"> -->
+        <img id = "shrek" src="assets/all_star.svg" alt="">
+      </button>
       <script src="menu.js"></script>
     </div>
   </body>    <!-- HTML display page ends here -->

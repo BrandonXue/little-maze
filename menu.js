@@ -5,10 +5,12 @@ var window_resize_timer; // variable used to store the timer
 var bot_reset_timer;
 var speed_input_timer;
 var can_generate;
+var trail_color;
 
-function resize_maze() {
+function on_window_resize() {
     not_generating = false;
     // Recalculate the unit area and wall thickness
+    const max = row_count > col_count ? row_count : col_count;
     const unit_area = window.innerWidth * 0.5 / col_count;
     maze.resize(unit_area);
 
@@ -28,7 +30,7 @@ window.addEventListener('resize', function() { // Whenever window resizes
     // that it was supposed to execute after the delay has elapsed.
     clearTimeout(window_resize_timer);
     // Then set another new timer with the same delay
-    window_resize_timer = setTimeout(resize_maze, window_resize_timeout);
+    window_resize_timer = setTimeout(on_window_resize, window_resize_timeout);
     // In effect, only the last resize event within 400ms
     // will call the resize_maze function
 });
@@ -51,6 +53,7 @@ document.getElementById("race").addEventListener("click", race);
 
 function generate_maze(maze_algorithm) {
     not_generating = false;
+    const max = row_count > col_count ? row_count : col_count;
     const unit_area = window.innerWidth * 0.5 / col_count;
     // Create a new maze object. This makes sure there is no garbage data in the path bits
     // of the grid from the previous run.
@@ -59,14 +62,14 @@ function generate_maze(maze_algorithm) {
         case "bsp":
             bsp_maze(maze);
             break;
-        case "k_msp":
+        case "k_mst":
             k_mst_maze(maze, 0);
             break;
         case "recur_bt":
             recur_bt_maze(maze, 0.4);
             break;
     }
-    resize_maze();
+    on_window_resize();
     not_generating = true;
 }
 
@@ -77,8 +80,8 @@ function enable_bot_movement() {
 function select_bsp_maze() {
     bot_may_move = false;
     game_running = false;
-    bot = null;
     generate_maze("bsp");
+    delete bot;
     bot = new Bot(maze, "yellow", speed);
     clearTimeout(bot_reset_timer);
     bot_reset_timer = setTimeout(enable_bot_movement, bot_reset_timeout);
@@ -88,8 +91,7 @@ document.getElementById("binary-space-partition").addEventListener("click", sele
 function select_k_mst_maze() {
     bot_may_move = false;
     game_running = false;
-    bot = null;
-    generate_maze("k_msp");
+    generate_maze("k_mst");
     bot = new Bot(maze, "yellow", speed);
     clearTimeout(bot_reset_timer);
     bot_reset_timer = setTimeout(enable_bot_movement, bot_reset_timeout);
@@ -147,7 +149,7 @@ function speed_input_update() {
     }
 }
 function speed_text_changed() {
-    console.log("using debounce")
+    //console.log("using debounce")
     clearTimeout(speed_input_timer);
     speed_input_timer = setTimeout(speed_input_update, speed_input_timeout);
 }
@@ -175,3 +177,75 @@ function reset_button_click() {
     bot_reset_timer = setTimeout(enable_bot_movement, bot_reset_timeout);
 }
 document.getElementById("reset-button").addEventListener("click", reset_button_click);
+
+
+function get_shrekt() {
+    console.log("You're in mah swamp now.")
+    x = document.getElementById('site-wrapper-div');
+    x.setAttribute("style", 'background-color: rgb(114,135,0)');
+
+    let options = document.querySelectorAll('[class="options-pane-inner"]');
+    options.forEach(
+        (elem) => {
+            elem.setAttribute("style", 'background-color: rgb(114,135,0)');
+    });
+    
+    options = document.querySelectorAll('[class="box-label"]');
+    options.forEach(
+        (elem) => {
+            elem.setAttribute("style", 'background-color: rgb(191, 213, 160)');
+    });
+
+    options = document.querySelectorAll('[class="box-label-top"]');
+    options.forEach(
+        (elem) => {
+            elem.setAttribute("style", 'background-color: rgb(191, 213, 160)');
+    });
+    
+    options = document.querySelectorAll('[class="options-pane-outer"]');
+    options.forEach(
+        (elem) => {
+            elem.setAttribute("style", 'background-color: rgb(191, 213, 160)');
+    });
+
+    x = document.getElementById('bottom-right-label');
+    x.setAttribute("style", 'background-color: rgb(191, 213, 160)');
+
+    document.getElementById('title').innerHTML = "You're in mah swamp now!";
+
+    document.getElementById('bottom-right-label').innerText = "You're in mah swamp now!";
+    document.getElementsByClassName('box-label')[3].innerText = "You're in mah swamp now!";
+
+    
+    document.getElementsByClassName('gen-maze-op-row')[6].innerText = "“There he goes. One of God's own prototypes. A high-powered mutant of some kind never even considered for mass production. Too weird to live, and too rare to die.” ― Hunter S. Thompson";
+
+    wall_color = "RGB(35, 142, 35)";
+    background_color = "RGB(85, 92, 70)";
+    trail_color = "#701800";
+    maze.repaint();
+    //document.getElementById('bottom-right-label').setAttribute("style", 'background-color: white');
+
+    //const option_panes = document.getElementsByClassName('options-pane-inner');
+    
+    /*option_panes.s
+    for (let i = 0; i < option_panes.length; ++i) {
+        s = option_panes[i];
+        s.setAttribute("style", 'background-color: rgb(114,135,0)');
+    }*/
+    //.style.background_color = "Lime";
+    //document.getElementsByClassName('site-wrapper')[0].style.background_color = "Lime";
+    // var x;
+    // try{
+    //     x = document.getElementById('site-wrapper-div');
+    //    //x = document.querySelector('[class = "site-wrapper"]');
+    //     x.setAttribute("style", 'background-color: lime');
+    //    //x = document.getElementById('site-wrapper-div');
+    //    //x.className = "site-wrapper-update";
+    //    //console.log(x);
+    // }
+    // catch{
+    //     console.log("doesnt work");
+    // }
+
+}
+document.getElementById("dlc").addEventListener("click", get_shrekt);
