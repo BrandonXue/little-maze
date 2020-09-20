@@ -1,3 +1,30 @@
+/**
+ * Brandon Xue          brandonx@csu.fullerton.edu
+ * Ernesto Hoogkkirk    Ernesto_Hooghkirk@csu.fullerton.edu
+ * Ryan Martinez        rmartinez72@csu.fullerton.edu
+ * 
+ * Last maintained (YYMMDD): 200920
+ * 
+ * This file contains code for the actors (bot and player).
+ * 
+ * Our bot follows a very simple left-hand rule when completing the maze.
+ * The bot leaves behind a trail which is pushed to a custom TrailStack class.
+ * 
+ * The player appears in the "play" and "race" game-modes, and can be controlled
+ * using the arrow keys on the keyboard. Key inputs are stored in a buffer, and
+ * the player unit prioritizes the last pressed key for more intuitive control.
+ * 
+ * Both actors store information about the maze that allows them to reset to their
+ * starting positions.
+ */
+
+
+
+/**
+ * ActorDirection is used to simplify the rotation of the bot.
+ * The direction can be easily changed by addition and treating
+ * the addition as happening on a mathematical ring.
+ */
 const ActorDirection = {
     "left": 0,
     "down": 1,
@@ -7,6 +34,9 @@ const ActorDirection = {
 };
 Object.freeze(ActorDirection);
 
+/**
+ * More readable keyboard codeKeys
+ */
 const KeyboardCodeKeys = {
     "left": 37,
     "up": 38,
@@ -15,6 +45,11 @@ const KeyboardCodeKeys = {
 };
 Object.freeze(KeyboardCodeKeys);
 
+
+
+/**
+ * An unsigned integer stack with a fixed capacity.
+ */
 class TrailStack {
     /**
      * @param {Number} total_cells Integer maximum number of cells in the grid
@@ -32,14 +67,24 @@ class TrailStack {
         }
     }
 
+    /**
+     * Push to stack
+     * @param {Number} cell_index Must be unsigned nonnegative integer between 0 and total_cells
+     */
     push(cell_index) {
         this.route_stack[(this.count)++] = cell_index; 
     }
 
+    /**
+     * Pop an unsigned integer off the stack
+     */
     pop() {
         return this.route_stack[--(this.count)];
     }
 
+    /**
+     * Peek the top element without removing it
+     */
     top() {
         if (this.count > 0)
             return this.route_stack[this.count-1];
@@ -51,6 +96,11 @@ class TrailStack {
     }
 }
 
+
+
+/**
+ * The maze-runner bot.
+ */
 class MazeBot {
     /**
      * Initialize a bot that runs mazes by following the left-hand rule.
@@ -78,6 +128,11 @@ class MazeBot {
         this.calc_unit_movement(move_speed);
     }
 
+    /**
+     * Calculate the unit movement that the bot must perform every frame.
+     * This guarantees the bot will realign with a grid cell while performing smooth movement.
+     * @param {Number} move_speed Integer between 1 and 8.
+     */
     calc_unit_movement(move_speed) {
         this.speed_update = false;
         // Speed can be an integer from 1 - 8
@@ -103,62 +158,17 @@ class MazeBot {
         this.speed_update = true;
     }
 
+    /**
+     * Find the starting direction for the bot. This is provided by the maze.
+     */
     find_initial_direction() {
         this.direction = maze.start_dir;
     }
 
     /**
-     * Adds a trail segment to our trail stack.
-     * Precondition:
-     * @param {Number} prev_row 
-     * @param {Number} prev_col 
-     */ 
-    set_trail(prev_row, prev_col){
-        const prev_trail_dat = (this.maze.grid[prev_row][prev_col]) >>> 4; 
-        const curr_trail_dat = (this.maze.grid[this.row][this.col]) >>> 4;
-        const prev_has_trail = prev_trail_dat != 0;
-        const curr_has_trail = curr_trail_dat != 0;
-
-        if (prev_has_trail) {
-            if (curr_has_trail) { // case 1: leaving cell with trail, going into cell with trail
-                this.maze.set_trail_bits(prev_row, prev_col, 0b00000000); // delete the trail from cell we just left
-                this.trail.pop();
-                // erase the tail in current cell that's pointing towards the old trail piece
-            } else { // case 2: leaving cell with trail, going into cell without trail
-                this.maze.set_trail_bits(this.row, this.col, 0b11110000); // set a trail in current cell
-                const index = this.col + this.row * this.maze.col_count;
-                this.trail.push(index); // push current cell to stack
-                // instead, add a tail towards new trail
-            }
-        } else { // prev doesn't have trail
-            if (curr_has_trail) {// case 3: leaving cell with no trail, going into cell with trail
-                // This state is no longer reachable because we always have a trail under us
-                let x;
-                // erase the tail in current cell that's pointing towards the old trail piece
-            } else { // case 4: leaving cell with no trail, going into cell without trail
-                this.maze.set_trail_bits(prev_row, prev_col, 0b11110000); // leave a trail in cell we just left
-                const index = this.col + this.row * this.maze.col_count;
-                this.trail.push(index);
-                // add a tail towards the current cell
-            }
-        }
-    }
-
-    //passing in previous location
-    paint_trail(prev_row, prev_col){
-        const stack = this.trail.route_stack;
-        for (let i = 0; i < this.trail.get_count(); ++i) {
-            const col = stack[i] % this.maze.col_count;
-            const row = floor(stack[i] / this.maze.col_count);
-            const x = (col * this.maze.unit_area) + this.maze.offset + (0.5 * this.maze.unit_area);
-            const y = (row * this.maze.unit_area) + this.maze.offset + (0.5 * this.maze.unit_area);
-            stroke(trail_color);
-            strokeWeight(0.05 * this.maze.unit_area);
-            fill(trail_color);
-            circle(x, y, (this.maze.unit_area-this.maze.wall_thickness) * .5);
-        }
-    } 
-    
+     * Put the bot back into the maze's starting cell and make it face the correct
+     * starting direction.
+     */
     reset() {
         // Clear all path data by using the path stack
         while (this.trail.get_count() > 0) {
@@ -176,16 +186,40 @@ class MazeBot {
         this.prev_col = this.col;
         this.find_initial_direction();
     }
-  
-    paint() {
-        const x = (this.col * this.maze.unit_area) + this.maze.offset + (0.5 * this.maze.unit_area);
-        const y = (this.row * this.maze.unit_area) + this.maze.offset + (0.5 * this.maze.unit_area);
-        stroke("clear"); // workaround for p5 bug where color doesn't change
-        fill("clear"); // unless it is set to something different
-        strokeWeight(0.05 * this.maze.unit_area);
-        stroke(this.outline_color);
-        fill(this.inner_color);
-        circle(x, y, (this.maze.unit_area-this.maze.wall_thickness) * .7);
+
+    /**
+     * Adds a trail segment to our trail stack.
+     * Precondition: The bot must be aligned with the grid (row and col are integers).
+     */ 
+    set_trail(){
+        const prev_trail_dat = (this.maze.grid[this.prev_row][this.prev_col]) >>> 4; 
+        const curr_trail_dat = (this.maze.grid[this.row][this.col]) >>> 4;
+        const prev_has_trail = prev_trail_dat != 0;
+        const curr_has_trail = curr_trail_dat != 0;
+
+        if (prev_has_trail) {
+            if (curr_has_trail) { // case 1: leaving cell with trail, going into cell with trail
+                this.maze.set_trail_bits(this.prev_row, this.prev_col, 0b00000000); // delete the trail from cell we just left
+                this.trail.pop();
+                // erase the tail in current cell that's pointing towards the old trail piece
+            } else { // case 2: leaving cell with trail, going into cell without trail
+                this.maze.set_trail_bits(this.row, this.col, 0b11110000); // set a trail in current cell
+                const index = this.col + this.row * this.maze.col_count;
+                this.trail.push(index); // push current cell to stack
+                // instead, add a tail towards new trail
+            }
+        } else { // prev doesn't have trail
+            if (curr_has_trail) {// case 3: leaving cell with no trail, going into cell with trail
+                // This state is no longer reachable because we always have a trail under us
+                let x;
+                // erase the tail in current cell that's pointing towards the old trail piece
+            } else { // case 4: leaving cell with no trail, going into cell without trail
+                this.maze.set_trail_bits(this.prev_row, this.prev_col, 0b11110000); // leave a trail in cell we just left
+                const index = this.col + this.row * this.maze.col_count;
+                this.trail.push(index);
+                // add a tail towards the current cell
+            }
+        }
     }
     
     /**
@@ -270,15 +304,51 @@ class MazeBot {
             // If global speed has changed, recalculate bot's unit movement
             if (this.speed_update)
                 this.calc_unit_movement(speed);
-            this.set_trail(this.prev_row, this.prev_col);
+            this.set_trail();
             this.prev_row = this.row;
             this.prev_col = this.col;
             this.find_direction();
             this.walk_forward();
         }
     }
+
+    /**
+     * Paint the current trail to the canvas.
+     */
+    paint_trail(){
+        const stack = this.trail.route_stack;
+        for (let i = 0; i < this.trail.get_count(); ++i) {
+            const col = stack[i] % this.maze.col_count;
+            const row = floor(stack[i] / this.maze.col_count);
+            const x = (col * this.maze.unit_area) + this.maze.offset + (0.5 * this.maze.unit_area);
+            const y = (row * this.maze.unit_area) + this.maze.offset + (0.5 * this.maze.unit_area);
+            stroke(trail_color);
+            strokeWeight(0.05 * this.maze.unit_area);
+            fill(trail_color);
+            circle(x, y, (this.maze.unit_area-this.maze.wall_thickness) * .5);
+        }
+    }
+  
+    /**
+     * Paint the bot on the canvas.
+     */
+    paint() {
+        const x = (this.col * this.maze.unit_area) + this.maze.offset + (0.5 * this.maze.unit_area);
+        const y = (this.row * this.maze.unit_area) + this.maze.offset + (0.5 * this.maze.unit_area);
+        stroke("clear"); // workaround for p5 bug where color doesn't change
+        fill("clear"); // unless it is set to something different
+        strokeWeight(0.05 * this.maze.unit_area);
+        stroke(this.outline_color);
+        fill(this.inner_color);
+        circle(x, y, (this.maze.unit_area-this.maze.wall_thickness) * .7);
+    }
 }
 
+
+
+/**
+ * The player unit that may be controlled by the keyboard.
+ */
 class GamePlayer {
     /**
      * Initialize a player unit that can explore the maze.
@@ -294,7 +364,7 @@ class GamePlayer {
         this.inner_color = inner_color;
         this.outline_color = outline_color;
         this.speed_update = false;
-        this.direction_stack = [];
+        this.direction_buffer = [];
 
         // Find initial direction
         this.find_initial_direction();
@@ -303,6 +373,11 @@ class GamePlayer {
         this.calc_unit_movement(move_speed);
     }
 
+    /**
+     * Calculate the unit movement that the bot must perform every frame.
+     * This guarantees the bot will realign with a grid cell while performing smooth movement.
+     * @param {Number} move_speed Integer between 1 and 8.
+     */
     calc_unit_movement(move_speed) {
         this.speed_update = false;
         // Speed can be an integer from 1 - 8
@@ -351,7 +426,10 @@ class GamePlayer {
         }
     }
 
-    
+    /**
+     * Put the bot back into the maze's starting cell and make it face the correct
+     * starting direction.
+     */
     reset() {
         // Get starting position + direction 
         this.row = this.maze.start_row;
@@ -359,6 +437,9 @@ class GamePlayer {
         this.find_initial_direction();
     }
   
+    /**
+     * Paint the player unit onto the canvas.
+     */
     paint() {
         const x = (this.col * this.maze.unit_area) + this.maze.offset + (0.5 * this.maze.unit_area);
         const y = (this.row * this.maze.unit_area) + this.maze.offset + (0.5 * this.maze.unit_area);
@@ -397,10 +478,10 @@ class GamePlayer {
      * @returns True if the bot is reoriented in a valid direction, false otherwise.
      */
     find_direction() {
-        if (this.direction_stack.length == 0)
+        if (this.direction_buffer.length == 0)
             this.direction = ActorDirection.none;
         else
-            this.direction = this.direction_stack[0];
+            this.direction = this.direction_buffer[0];
     }
 
     /**
@@ -427,27 +508,39 @@ class GamePlayer {
         }
     }
 
+    /**
+     * Called by event listeners when specific keyboard keys are pressed.
+     * @param {Number} key_code The standardized integer keyCode
+     */
     key_down(key_code) {
         // If key already down and isn't the top of stack, move it to top of stack
-        const index = this.direction_stack.indexOf(key_code);
+        const index = this.direction_buffer.indexOf(key_code);
         if (index > 0) {
-            const temp = this.direction_stack[index];
-            this.direction_stack[index] = this.direction_stack[0];
-            this.direction_stack[0] = temp;
+            const temp = this.direction_buffer[index];
+            this.direction_buffer[index] = this.direction_buffer[0];
+            this.direction_buffer[0] = temp;
         } else if (index == -1) { // else if key isn't found, add key to top of stack (front)
-            this.direction_stack.splice(0, 0, key_code);
+            this.direction_buffer.splice(0, 0, key_code);
         }
 
     }
 
+    /**
+     * Called by event listeners when specific keyboard keys are released.
+     * @param {Number} key_code The standardized integer keyCode
+     */
     key_up(key_code) {
         // Find the key that we just released and remove it
-        const index = this.direction_stack.indexOf(key_code);
+        const index = this.direction_buffer.indexOf(key_code);
         if (index != -1) {
-            this.direction_stack.splice(index, 1);
+            this.direction_buffer.splice(index, 1);
         }
     }
 
+    /**
+     * Move the player based on key presses. The player will keep moving until it
+     * re-aligns with the grid again to prevent alignment headaches.
+     */
     move() {
         // When not aligned with the grid, try moving in its current direction
         if ( (this.row != floor(this.row)) || (this.col != floor(this.col)) ) {
@@ -465,17 +558,31 @@ class GamePlayer {
     }
 }
 
+/**
+ * Add listeners for keydown events to aid player control.
+ */
 window.onkeydown = e => {
     switch (e.keyCode) {
-        case 32: case 37: case 38: case 39: case 40:
+        // left, up, right, down are prevented from scrolling the page and sent to the player unit
+        case 37: case 38: case 39: case 40:
+            e.preventDefault();
+            if (player != null) {
+                player.key_down(e.keyCode);
+            }
+            break;
+        // Spacebar is prevented from scrolling the page
+        case 32: 
             e.preventDefault();
             break;
+        // Other keys have no associated action
         default:
+            break;
     }
-    if (player != null)
-        player.key_down(e.keyCode);
 }
 
+/**
+ * Add listeners for keyup events so that keyboard actions can be cleared.
+ */
 window.onkeyup = e => {
     if (player != null)
         player.key_up(e.keyCode);

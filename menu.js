@@ -1,8 +1,28 @@
-const window_resize_timeout = 500;
-var window_resize_timer; // variable used to store the timer
-var can_generate;
-var trail_color;
+/**
+ * Brandon Xue          brandonx@csu.fullerton.edu
+ * Ernesto Hoogkkirk    Ernesto_Hooghkirk@csu.fullerton.edu
+ * Ryan Martinez        rmartinez72@csu.fullerton.edu
+ * 
+ * Last maintained (YYMMDD): 200920
+ * 
+ * This file contains code for handling UI onclick events and window resizing,
+ * and other menu related functionality.
+ * 
+ * There is also a function for a little (not so little) easter egg.
+ */
 
+
+
+const window_resize_timeout = 500; // Delay for debouncing window resize events
+var window_resize_timer; // variable used to store window debouncing timer
+
+/**
+ * Recalculate the best-fitting canvas size, update the maze
+ * with the new measurements so its draw functions work properly,
+ * and repaint the maze.
+ * 
+ * This function will temporarily disable the game loop.
+ */
 function refit_scene() {
     noLoop();
     // Recalculate the unit area and wall thickness
@@ -29,69 +49,10 @@ window.addEventListener('resize', function() { // Whenever window resizes
     window_resize_timer = setTimeout(refit_scene, window_resize_timeout);
 });
 
-function place_actors() {
-    switch (game_mode) {
-        case GameMode.watch:
-            player = null;
-            bot = new MazeBot(maze, 'yellow', 'orange', speed);
-            break;
-        case GameMode.play:
-            bot = null;
-            player = new GamePlayer(maze, 'cyan', 'pink', speed);
-            break;
-        case GameMode.race:
-            bot = new MazeBot(maze, 'yellow', 'orange', speed);
-            player = new GamePlayer(maze, 'cyan', 'pink', speed);
-            break;
-    }
-}
-
-function generate_maze(maze_algorithm) {
-    noLoop();
-    const max = row_count > col_count ? row_count : col_count;
-    const unit_area = window.innerWidth * 0.5 / col_count;
-    // Create a new maze object. This makes sure there is no garbage data in the path bits
-    // of the grid from the previous run.
-
-    maze = new Maze(row_count, col_count, unit_area, wall_color, background_color);
-    switch (maze_algorithm) {
-        case 'bsp':
-            bsp_maze(maze);
-            break;
-        case 'k_mst':
-            const bias = (slider.value() / 100);
-            k_mst_maze(maze, bias);
-            break;
-        case 'recur_bt':
-            const straightness = (slider.value() + 100) / 200;
-            recur_bt_maze(maze, straightness);
-            break;
-    }
-    place_actors();
-    refit_scene();
-}
-
-function lock_speed(fixed_speed) {
-    const speed_input_textbox = document.getElementById('speed-input');
-    speed_input_textbox.value = fixed_speed;
-    speed_input_textbox.disabled = true;
-    speed = fixed_speed;
-    if (player != null)
-        player.notify_speed_update();
-    if (bot != null)
-        bot.notify_speed_update();
-}
-
-function unlock_speed() {
-    const speed_input_textbox = document.getElementById('speed-input');
-    speed_input_textbox.disabled = false;
-    on_speed_input();
-    if (player != null) // currently player is always null when this happens, might change later
-        player.notify_speed_update();
-    if (bot != null)
-        bot.notify_speed_update();
-}
-
+/**
+ * Called when the watch button on the main menu is clicked.
+ * Hides the main menu, enters watch mode with the game paused.
+ */
 function watch_on_click() {
     game_running = false;
     const x = document.getElementById('main-side-panel');
@@ -99,10 +60,14 @@ function watch_on_click() {
 
     game_mode = GameMode.watch; // Set the game mode to watch: watching the bot run
     unlock_speed();
-    generate_maze("bsp");
+    set_scene("bsp");
 }
 document.getElementById('watch').addEventListener('click', watch_on_click);
 
+/**
+ * Called when the play button on the main menu is clicked.
+ * Hides the main menu, enters play mode with the game running.
+ */
 function play_on_click() {
     game_running = true; // single player, allow them to move immediately
     const x = document.getElementById('main-side-panel');
@@ -110,10 +75,15 @@ function play_on_click() {
 
     game_mode = GameMode.play; // Set the game mode to play: play the game solo
     lock_speed(5);
-    generate_maze("bsp");
+    set_scene("bsp");
 }
 document.getElementById('play-mode').addEventListener('click', play_on_click);
 
+/**
+ * Called when the race button on the main menu is clicked.
+ * Hides the main menu, enters race mode with the game paused.
+ * This gives the player some time to prepare.
+ */
 function race_on_click() {
     game_running = false;
     const x = document.getElementById('main-side-panel');
@@ -121,10 +91,14 @@ function race_on_click() {
 
     game_mode = GameMode.race; // Set the game mode to race: race against the bot
     lock_speed(5);
-    generate_maze("bsp");
+    set_scene("bsp");
 }
 document.getElementById('race').addEventListener('click', race_on_click);
 
+/**
+ * Open up the main menu again.
+ * Disables the game loop.
+ */
 function return_to_main_on_click() {
     noLoop();
     const x = document.getElementById('main-side-panel');
@@ -132,24 +106,39 @@ function return_to_main_on_click() {
 }
 document.getElementById('return-to-main').addEventListener('click', return_to_main_on_click);
 
+/**
+ * Called when the Binary Space Partition button is clicked.
+ * Sets a new scene using the requested algorithm.
+ */
 function select_bsp_maze() {
     game_running = false;
-    generate_maze('bsp');
+    set_scene('bsp');
 }
 document.getElementById('binary-space-partition').addEventListener('click', select_bsp_maze);
 
+/**
+ * Called when the Kruskal's MST Merge button is clicked.
+ * Sets a new scene using the requested algorithm.
+ */
 function select_k_mst_maze() {
     game_running = false;
-    generate_maze('k_mst');
+    set_scene('k_mst');
 }
 document.getElementById('kruskals-mst-merge').addEventListener('click', select_k_mst_maze);
 
+/**
+ * Called when the Recursive Backtracking button is clicked.
+ * Sets a new scene using the requested algorithm.
+ */
 function select_recur_bt_maze() {
     game_running = false;
-    generate_maze('recur_bt');
+    set_scene('recur_bt');
 }
 document.getElementById('recursive-backtracking').addEventListener('click', select_recur_bt_maze);
 
+/**
+ * Called when an input event is detected on the rows text box.
+ */
 function row_input_update() {
     const row_input = document.getElementById('rows-input').value;
     if (!isNaN(row_input)) {
@@ -163,6 +152,9 @@ function row_input_update() {
 }
 document.getElementById('rows-input').addEventListener('input', row_input_update);
 
+/**
+ * Called when an input event is detected on the columns text box.
+ */
 function col_input_update() {
     const col_input = document.getElementById('cols-input').value;
     if (!isNaN(col_input)) {
@@ -176,6 +168,10 @@ function col_input_update() {
 }
 document.getElementById('cols-input').addEventListener('input', col_input_update);
 
+/**
+ * Called when an input event is detected on the speed text box.
+ * This will notify all actors on the scene of the new speed.
+ */
 function on_speed_input() {
     const speed_input = document.getElementById('speed-input').value;
     if (!isNaN(speed_input)) {
@@ -195,23 +191,37 @@ function on_speed_input() {
 }
 document.getElementById('speed-input').addEventListener('input', on_speed_input);
 
+/**
+ * On triangle play button click, run the game.
+ */
 function play_button_click() {
     game_running = true;
 }
 document.getElementById('play-button').addEventListener('click', play_button_click);
 
+/**
+ * On pause button click, pause the game.
+ */
 function pause_button_click() {
     game_running = false;
 }
 document.getElementById('pause-button').addEventListener('click', pause_button_click);
 
+/**
+ * On reset button click, reset all actors on the scene and pause the game.
+ */
 function reset_button_click() {
     game_running = false;
-    bot.reset();
+    if (player != null)
+        player.reset();
+    if (bot != null)
+        bot.reset();
 }
 document.getElementById('reset-button').addEventListener('click', reset_button_click);
 
-
+/**
+ * Hmm, what might this be?
+ */
 function get_shrekt() {
     let x = document.getElementById('site-wrapper-div');
     x.setAttribute('style', 'background-color: rgb(114,135,0)');

@@ -1,12 +1,19 @@
 /**
- * Brandon Xue, Ernesto Hoogkkirk, Ryan Martinez
+ * Brandon Xue          brandonx@csu.fullerton.edu
+ * Ernesto Hoogkkirk    Ernesto_Hooghkirk@csu.fullerton.edu
+ * Ryan Martinez        rmartinez72@csu.fullerton.edu
  * 
- * This file contains utility functions and structures.
+ * Last maintained (YYMMDD): 200920
  * 
- * The Enums allow for human-readable numeric values to be used,
- * and are compatible with bit-masking.
+ * This file contains generalized functionalities, including:
+ * - Random number functions with non-uniform distributions
+ * - Fixed capacity hash sets for unsigned integers
+ * - Fixed capacity simple disjoint set for checking set intersections.
+ * - Various Enums
  */
 
+
+ 
 /**
  * TwoBitDirection can be used when a single cardinal direction needs to be
  * represented in the smallest amount of space.

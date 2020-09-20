@@ -1,8 +1,25 @@
-<!DOCTYPE html>    <!-- this is a JS comment -->    <!--  -->
-<html lang="">    <!-- HTML page begs/ends w 'html' tag -->
-  <head>    <!-- HTML page has 'head'section and 'body' section -->
+<!--
+Brandon Xue          brandonx@csu.fullerton.edu
+ Ernesto Hoogkkirk    Ernesto_Hooghkirk@csu.fullerton.edu
+ Ryan Martinez        rmartinez72@csu.fullerton.edu
+ 
+ Last maintained (YYMMDD): 200920
+ 
+ The html page for our little maze game. This file loads all the necessary
+ scripts for the maze game in the correct order. The menu script must be
+ loaded after all the referenced elements are created.
+
+ The web page consists of a maze game at the center of the screen, and two
+ side panels flanking it. Both side panels host some game controls and
+ information tidbits. The main menu can also be accessed from the left side,
+ where the game-mode can be changed.
+-->
+
+<!DOCTYPE html>
+<html lang="">
+  <head>
     <meta charset="utf-8">
-    <meta foo="Time-stamp: 2020-09-019 BrandonX, ErnestoH, RyanM>">
+    <meta foo="Time-stamp: 2020-09-20 BrandonX, ErnestoH, RyanM>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Little Maze</title>     <!-- Browser or tab title -->
@@ -13,14 +30,22 @@
 
     <script src="utils.js"></script>    <!-- Load some utility functions and structures -->
     <script src="maze.js"></script>     <!-- Load maze class and maze generation algorithms -->
-    <script src="bot.js"></script>      <!-- Bot class used to solve the maze and track the bot -->
-    <script src="main.js"></script>    <!-- Load setup() draw() P5 functions -->
+    <script src="actor.js"></script>    <!-- Bot and Player classes -->
+    <script src="main.js"></script>     <!-- Load setup() draw() P5 functions -->
   </head>
+
   <body> <!-- HTML page body, where raw text gets displayed on the page -->
+    <!--Top level div where site-wide properties may be set-->
     <div id="site-wrapper-div" class="site-wrapper">
-      <h1 id="title">Little Maze</h1>    <!-- Text in a high priority heading -->
+      <h1 id="title">Little Maze</h1>
+
+      <!-- The horizontal div where the game and side panels reside-->
       <div class ="parent">
+
+        <!-- Container for the main menu and left menu panels-->
         <div class="stacked-panel-holder">
+
+          <!-- Main menu panel appears overlapping on top of left side panel-->
           <div id="main-side-panel">
             <button id="watch" class="main-buttons">Watch</button>
             <div class="gif-placeholder"></div> 
@@ -29,7 +54,11 @@
             <button id="race"  class="main-buttons">Race</button>
             <div class="gif-placeholder"></div>
           </div>
+
+          <!-- Left side panel-->
           <div class="stacked-panel">
+
+            <!-- Generate Maze -->
             <div class="box-label-top">Generate Maze</div>
             <div class="options-pane-outer">
               <div class="options-pane-inner">
@@ -38,6 +67,8 @@
                 <button id="recursive-backtracking" class="maze-alg-button">Recursive Backtracking</button>
               </div>
             </div>
+
+            <!-- Maze Options-->
             <div class="box-label">Maze Options</div>
             <div class="options-pane-outer">
               <div class="options-pane-inner">
@@ -55,6 +86,8 @@
                 </div>
               </div>
             </div>
+
+            <!-- Maze Controls -->
             <div class="box-label">Maze Controls</div>
             <div class="options-pane-outer">
               <div class="options-pane-inner">
@@ -71,27 +104,34 @@
                 </div>
               </div>
             </div>
+
             <button id="return-to-main">Return to Main Menu</button>
-          </div>
-        </div>
+            
+          </div> <!-- End of left side panel -->
 
-        <div id="canvas-div"> </div> <!-- Our p5 canvas goes inside this div -->
+        </div> <!-- End of stacked left-hand side panels -->
 
+        <!-- Our p5 canvas goes inside this div -->
+        <div id="canvas-div"> </div>
+
+        <!-- The right side panel-->
         <div class="side-panel">
+          <!-- Details -->
           <div class="box-label-top">Details</div>
-            <div class="options-pane-outer">
-              <div class="options-pane-inner">
-                Kruskals: 
-                <br>
-                Adjust the orientation bias
-                <br>
-                <br>
-                Recursive: 
-                <br>
-                Adjust the straightness
-                <div id="slider-div"></div>
-              </div>
+          <div class="options-pane-outer">
+            <div class="options-pane-inner">
+              Kruskals: 
+              <br>
+              Adjust the orientation bias
+              <br><br>
+              Recursive: 
+              <br>
+              Adjust the straightness
+              <div id="slider-div"></div>
             </div>
+          </div>
+          
+          <!-- Maze Options Valid Inputs-->
           <div class="box-label">Maze Options Valid Inputs</div>
           <div class="options-pane-outer">
             <div class="options-pane-inner">
@@ -106,6 +146,8 @@
               </div>
             </div>
           </div>
+
+          <!-- Hints-->
           <div class="box-label">Hints</div>
           <div class="options-pane-outer">
             <div class="options-pane-inner">
@@ -114,18 +156,28 @@
               </div>
             </div>
           </div>
+
           <div id="bottom-right-label"></div>
-        </div>
-      </div>
-      <p>    <!-- A paragraph 'break', to start a new paragraph -->
+
+        </div> <!-- End of right side panel-->
+
+      </div> <!-- End of Parent-->
+
+      <!-- Footnote credits -->
+      <p>
         By team Farquads: Brandon Xue, Ernesto Hooghkirk, Ryan Martinez
       </p>
+
+      <!-- Shrek -->
       <button id = "dlc" ><!--//class = "dlc"> -->
         <img id = "shrek" src="assets/all_star.svg" alt="">
       </button>
-      <script src="menu.js"></script>
-    </div>
-  </body>    <!-- HTML display page ends here -->
+
+      <script src="menu.js"></script> <!-- Menu scripts must be loaded after elements are created-->
+
+    </div> <!-- End of site wrapper -->
+
+  </body> <!-- HTML display page ends here -->
 </html>
     <!-- F12 on keyboard opens Console+Inspector+Debugger window on most Browsers. -->
     <!-- F12 Debugger window > Watch+Breakpoint pane > 2-vertical-bars icon stops anim. -->
