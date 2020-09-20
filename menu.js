@@ -32,16 +32,16 @@ window.addEventListener('resize', function() { // Whenever window resizes
 function place_actors() {
     switch (game_mode) {
         case GameMode.watch:
-            bot = new MazeBot(maze, 'yellow', 'orange', speed);
             player = null;
+            bot = new MazeBot(maze, 'yellow', 'orange', speed);
             break;
         case GameMode.play:
             bot = null;
-            player = new GamePlayer(maze, 'yellow', 'orange', speed - 1);
+            player = new GamePlayer(maze, 'cyan', 'pink', speed);
             break;
         case GameMode.race:
-            bot = new MazeBot(maze, 'yellow', speed);
-            player = new GamePlayer(maze, 'yellow', speed - 1);
+            bot = new MazeBot(maze, 'yellow', 'orange', speed);
+            player = new GamePlayer(maze, 'cyan', 'pink', speed);
             break;
     }
 }
@@ -71,29 +71,56 @@ function generate_maze(maze_algorithm) {
     refit_scene();
 }
 
+function lock_speed(fixed_speed) {
+    const speed_input_textbox = document.getElementById('speed-input');
+    speed_input_textbox.value = fixed_speed;
+    speed_input_textbox.disabled = true;
+    speed = fixed_speed;
+    if (player != null)
+        player.notify_speed_update();
+    if (bot != null)
+        bot.notify_speed_update();
+}
+
+function unlock_speed() {
+    const speed_input_textbox = document.getElementById('speed-input');
+    speed_input_textbox.disabled = false;
+    on_speed_input();
+    if (player != null) // currently player is always null when this happens, might change later
+        player.notify_speed_update();
+    if (bot != null)
+        bot.notify_speed_update();
+}
+
 function watch_on_click() {
+    game_running = false;
     const x = document.getElementById('main-side-panel');
     x.setAttribute('style', 'display: none');
 
     game_mode = GameMode.watch; // Set the game mode to watch: watching the bot run
+    unlock_speed();
     generate_maze("bsp");
 }
 document.getElementById('watch').addEventListener('click', watch_on_click);
 
 function play_on_click() {
+    game_running = true; // single player, allow them to move immediately
     const x = document.getElementById('main-side-panel');
     x.setAttribute('style', 'display: none');
 
     game_mode = GameMode.play; // Set the game mode to play: play the game solo
+    lock_speed(5);
     generate_maze("bsp");
 }
 document.getElementById('play-mode').addEventListener('click', play_on_click);
 
 function race_on_click() {
+    game_running = false;
     const x = document.getElementById('main-side-panel');
     x.setAttribute('style', 'display: none');
 
     game_mode = GameMode.race; // Set the game mode to race: race against the bot
+    lock_speed(5);
     generate_maze("bsp");
 }
 document.getElementById('race').addEventListener('click', race_on_click);

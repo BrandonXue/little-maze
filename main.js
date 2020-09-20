@@ -98,19 +98,27 @@ function draw() {  // P5 Frame Re-draw Fcn, Called for Every Frame.
 
 function watch_mode_draw_tasks() {
     image(maze_buff, 0, 0); // Paint the maze
-    if (game_running)
+    if (game_running) {
         bot.move(); // Move the bot
+    }
     bot.paint_trail(); // Draw the path that the bot has set
     bot.paint(); // Draw the bot itself
 }
 
 function play_mode_draw_tasks() {
     image(maze_buff, 0, 0); // Paint the maze
-    if (game_running)
+    if (game_running) {
         player.move(); // Move the player
+    }
     player.paint(); // Draw the player
 }
 
 function race_mode_draw_tasks() {
-
+    image(maze_buff, 0, 0); // Paint the maze
+    if (game_running) {
+        player.move(); // Move the player
+        bot.move(); // Move the bot
+    }
+    bot.paint(); // Draw bot first so it doesn't interfere with player
+    player.paint(); // Draw the player last so they are on top
 }

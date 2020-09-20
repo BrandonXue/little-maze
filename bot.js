@@ -466,6 +466,12 @@ class GamePlayer {
 }
 
 window.onkeydown = e => {
+    switch (e.keyCode) {
+        case 32: case 37: case 38: case 39: case 40:
+            e.preventDefault();
+            break;
+        default:
+    }
     if (player != null)
         player.key_down(e.keyCode);
 }
