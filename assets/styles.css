@@ -132,7 +132,7 @@ body {
 
 #bottom-right-label {
     font: small-caps bold 24px/1 sans-serif;
-    font-size: 1.2vw;
+    font-size: 1.7vw;
     text-align: center;
     border-top: 0.3vw solid black;
     width: 100%;
@@ -221,4 +221,8 @@ body {
 .button-inner{
     width: 2vw;
     height: 2vw;
+}
+
+.left-text-box{
+    width: fit-content;
 }

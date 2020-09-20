@@ -589,6 +589,10 @@ function k_mst_maze(maze, orientation) {
         is_top = (edge_sequence[i] % 2) != 0;
         const grid_index1 = floor(edge_sequence[i] / 2);
         const grid_index2 = is_top ? grid_index1 - maze.col_count : grid_index1-1;
+        //debug
+        if (grid_index2 < 0 || grid_index1 < 0)
+            console.log(grid_index1, grid_index2);
+        // end debug
         const deleted = cell_sets.try_join_trees(grid_index1, grid_index2);
         if (deleted) {
             // Horizontal walls

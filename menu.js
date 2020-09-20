@@ -213,8 +213,8 @@ function get_shrekt() {
 
     document.getElementById('title').innerHTML = "You're in mah swamp now!";
 
-    document.getElementById('bottom-right-label').innerText = "You're in mah swamp now!";
-    document.getElementsByClassName('box-label')[3].innerText = "You're in mah swamp now!";
+    document.getElementById('bottom-right-label').innerText = "..you're an all star.";
+    document.getElementsByClassName('box-label')[3].innerText = "Hey now,";
 
     
     document.getElementsByClassName('gen-maze-op-row')[6].innerText = "“There he goes. One of God's own prototypes. A high-powered mutant of some kind never even considered for mass production. Too weird to live, and too rare to die.” ― Hunter S. Thompson";

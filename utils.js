@@ -155,11 +155,16 @@ class DisjointSet {
     }
 
     get_update_root(set_index) {
-        if (this.sets[set_index] == undefined) {
+        // Debug
+        /*if (this.sets[set_index] < 0)
+            console.log(set_index);*/
+        /*if (this.sets[set_index] == undefined) {
             console.log("this.sets[set_index] was undefined for set_index ", set_index);
             return 1;
-        }
+        }*/
         //console.log(set_index);
+        // end debug
+
         if (this.sets[set_index] == 0) // The current node is the root of its tree
             return set_index;
 
@@ -175,7 +180,9 @@ class DisjointSet {
         const root2 = this.get_update_root(index2);
 
         // debug
-        //const total_cells = 
+        /*const total_cells = maze.row_count * maze.col_count;
+        if (index1 >= total_cells || index2 >= total_cells || index1 < 0 || index2 < 0)
+            console.log(index1, index2);*/
         // end debug
 
         // If both nodes are already part of the same tree, return false
