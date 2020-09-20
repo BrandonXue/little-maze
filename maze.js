@@ -543,13 +543,14 @@ function k_mst_maze(maze, orientation) {
     // Create a new disjoint set with one set for each cell in the maze grid
     const total_cells = maze.row_count * maze.col_count;
     const total_edges = (2 * maze.row_count * maze.col_count) - maze.row_count - maze.col_count;
+    const max_edge = (2 * maze.row_count * maze.col_count); // the maximum edge "index"
     const cell_sets = new DisjointSet(total_cells);
     let edge_sequence;
-    if (total_edges < 256) { // 2^8
+    if (max_edge < 256) { // 2^8
         edge_sequence = new Uint8Array(total_edges);
-    } else if (total_edges < 65536) { // 2^16
+    } else if (max_edge < 65536) { // 2^16
         edge_sequence = new Uint16Array(total_edges);
-    } else if (total_edges < 4294967296) { // 2^32
+    } else if (max_edge < 4294967296) { // 2^32
         edge_sequence = new Uint32Array(total_edges);
     } else {
         edge_sequence = new Array(total_edges);
@@ -561,13 +562,16 @@ function k_mst_maze(maze, orientation) {
     let count = 0;
     for (let i = 0; i < total_cells; ++i) {
         // If we're not in the left column, push left walls
-        if ((i % maze.col_count) != 0)
+        if ((i % maze.col_count) != 0) {
             edge_sequence[count++] = 2 * i;
+        }
 
         // If we're not in the top row, push top walls
-        if (i >= maze.col_count)
+        if (i >= maze.col_count) {
             edge_sequence[count++] = (2 * i) + 1;
+        }
     }
+
 
     // While we have more than one set
     // Iterate over all edges and delete if possible
@@ -585,14 +589,9 @@ function k_mst_maze(maze, orientation) {
             if (!is_top && random() < chance)
                 i = floor(random() * count);
         }
-
         is_top = (edge_sequence[i] % 2) != 0;
         const grid_index1 = floor(edge_sequence[i] / 2);
         const grid_index2 = is_top ? grid_index1 - maze.col_count : grid_index1-1;
-        //debug
-        if (grid_index2 < 0 || grid_index1 < 0)
-            console.log(grid_index1, grid_index2);
-        // end debug
         const deleted = cell_sets.try_join_trees(grid_index1, grid_index2);
         if (deleted) {
             // Horizontal walls
@@ -614,7 +613,8 @@ function k_mst_maze(maze, orientation) {
         // If it is deleted, we no longer need to track it.
         // If it couldn't be deleted, we will never need to check if it can be deleted again.
         // since uint arrays dont support splice, we can just swap with the last element and decrement count.
-        edge_sequence[i] = edge_sequence[--count];
+        --count;
+        edge_sequence[i] = edge_sequence[count];
     }
 }
 
