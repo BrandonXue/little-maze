@@ -33,15 +33,15 @@ function place_actors() {
     switch (game_mode) {
         case GameMode.watch:
             bot = new MazeBot(maze, 'yellow', 'orange', speed);
-            player = false;
+            player = null;
             break;
         case GameMode.play:
-            bot = false;
-            player = new MazeBot(maze, 'yellow', 'orange', speed - 1);
+            bot = null;
+            player = new GamePlayer(maze, 'yellow', 'orange', speed - 1);
             break;
         case GameMode.race:
             bot = new MazeBot(maze, 'yellow', speed);
-            player = new MazeBot(maze, 'yellow', speed - 1);
+            player = new GamePlayer(maze, 'yellow', speed - 1);
             break;
     }
 }
@@ -60,15 +60,14 @@ function generate_maze(maze_algorithm) {
             break;
         case 'k_mst':
             const bias = (slider.value() / 100);
-            console.log(bias);
             k_mst_maze(maze, bias);
             break;
         case 'recur_bt':
             const straightness = (slider.value() + 100) / 200;
-            console.log(straightness);
             recur_bt_maze(maze, straightness);
             break;
     }
+    place_actors();
     refit_scene();
 }
 
@@ -77,7 +76,7 @@ function watch_on_click() {
     x.setAttribute('style', 'display: none');
 
     game_mode = GameMode.watch; // Set the game mode to watch: watching the bot run
-    loop();
+    generate_maze("bsp");
 }
 document.getElementById('watch').addEventListener('click', watch_on_click);
 
@@ -86,7 +85,7 @@ function play_on_click() {
     x.setAttribute('style', 'display: none');
 
     game_mode = GameMode.play; // Set the game mode to play: play the game solo
-    loop();
+    generate_maze("bsp");
 }
 document.getElementById('play-mode').addEventListener('click', play_on_click);
 
@@ -95,7 +94,7 @@ function race_on_click() {
     x.setAttribute('style', 'display: none');
 
     game_mode = GameMode.race; // Set the game mode to race: race against the bot
-    loop();
+    generate_maze("bsp");
 }
 document.getElementById('race').addEventListener('click', race_on_click);
 
@@ -109,21 +108,18 @@ document.getElementById('return-to-main').addEventListener('click', return_to_ma
 function select_bsp_maze() {
     game_running = false;
     generate_maze('bsp');
-    place_actors();
 }
 document.getElementById('binary-space-partition').addEventListener('click', select_bsp_maze);
 
 function select_k_mst_maze() {
     game_running = false;
     generate_maze('k_mst');
-    place_actors();
 }
 document.getElementById('kruskals-mst-merge').addEventListener('click', select_k_mst_maze);
 
 function select_recur_bt_maze() {
     game_running = false;
     generate_maze('recur_bt');
-    place_actors();
 }
 document.getElementById('recursive-backtracking').addEventListener('click', select_recur_bt_maze);
 
@@ -164,7 +160,10 @@ function on_speed_input() {
         if (speed_input_int > 8)
             speed_input_int = 8;
         speed = speed_input_int;
-        bot.notify_speed_update();
+        if (player != null)
+            player.notify_speed_update();
+        if (bot != null)
+            bot.notify_speed_update();
     }
 }
 document.getElementById('speed-input').addEventListener('input', on_speed_input);
