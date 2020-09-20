@@ -32,14 +32,19 @@ var col_count;
 var wall_color;
 var background_color;
 var speed;
-
+var slider;
 
 /**
  * Called by the P5 library when the program starts.
  * Check reference for more info: https://p5js.org/reference/#/p5/setup
  */
 function setup() { // P5 Setup Function
+    slider = createSlider(-100, 100, 0);
+    slider.parent("slider-div");
+
     frameRate(60);
+
+    // Set maze related defaults
     new_row_count = row_count = 40;
     new_col_count = col_count = 40;
     wall_color = "white";

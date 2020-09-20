@@ -64,10 +64,14 @@ function generate_maze(maze_algorithm) {
             bsp_maze(maze);
             break;
         case "k_mst":
-            k_mst_maze(maze, 0);
+            const bias = (slider.value() / 100);
+            console.log(bias);
+            k_mst_maze(maze, bias);
             break;
         case "recur_bt":
-            recur_bt_maze(maze, 0.4);
+            const straightness = (slider.value() + 100) / 200;
+            console.log(straightness);
+            recur_bt_maze(maze, straightness);
             break;
     }
     on_window_resize();
@@ -224,3 +228,4 @@ function get_shrekt() {
     maze.repaint();
 }
 document.getElementById("dlc").addEventListener("click", get_shrekt);
+

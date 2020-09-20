@@ -152,6 +152,8 @@ body {
 }
 
 .options-pane-inner {
+    font: small-caps bold 24px/1 sans-serif;
+    font-size: 1.2vw;
     width: 90%;
     height: 100%;
     border-left: 0.4vw solid black;
