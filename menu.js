@@ -1,14 +1,10 @@
-const window_resize_timeout = 250;
-const bot_reset_timeout = 500;
-const speed_input_timeout = 100;
+const window_resize_timeout = 500;
 var window_resize_timer; // variable used to store the timer
-var bot_reset_timer;
-var speed_input_timer;
 var can_generate;
 var trail_color;
 
-function on_window_resize() {
-    not_generating = false;
+function refit_scene() {
+    noLoop();
     // Recalculate the unit area and wall thickness
     const max = row_count > col_count ? row_count : col_count;
     const unit_area = window.innerWidth * 0.5 / col_count;
@@ -21,7 +17,7 @@ function on_window_resize() {
     canvas.resize(width, height);
     maze_buff = createGraphics(width, height);
     maze.repaint();
-    not_generating = true;
+    loop();
 }
 
 // Add an event listener to listen for window resizing
@@ -30,29 +26,28 @@ window.addEventListener('resize', function() { // Whenever window resizes
     // that it was supposed to execute after the delay has elapsed.
     clearTimeout(window_resize_timer);
     // Then set another new timer with the same delay
-    window_resize_timer = setTimeout(on_window_resize, window_resize_timeout);
-    // In effect, only the last resize event within 400ms
-    // will call the resize_maze function
+    window_resize_timer = setTimeout(refit_scene, window_resize_timeout);
 });
 
-
-function play() {
-    console.log("play pressed");
+function place_actors() {
+    switch (game_mode) {
+        case GameMode.watch:
+            bot = new MazeBot(maze, 'yellow', 'orange', speed);
+            player = false;
+            break;
+        case GameMode.play:
+            bot = false;
+            player = new MazeBot(maze, 'yellow', 'orange', speed - 1);
+            break;
+        case GameMode.race:
+            bot = new MazeBot(maze, 'yellow', speed);
+            player = new MazeBot(maze, 'yellow', speed - 1);
+            break;
+    }
 }
-document.getElementById("play-mode").addEventListener("click", play);
-
-function watch() {
-    console.log("watch pressed");
-}
-document.getElementById("watch").addEventListener("click", watch);
-
-function race() {
-    alert("This feature is coming soon!");
-}
-document.getElementById("race").addEventListener("click", race);
 
 function generate_maze(maze_algorithm) {
-    not_generating = false;
+    noLoop();
     const max = row_count > col_count ? row_count : col_count;
     const unit_area = window.innerWidth * 0.5 / col_count;
     // Create a new maze object. This makes sure there is no garbage data in the path bits
@@ -60,61 +55,80 @@ function generate_maze(maze_algorithm) {
 
     maze = new Maze(row_count, col_count, unit_area, wall_color, background_color);
     switch (maze_algorithm) {
-        case "bsp":
+        case 'bsp':
             bsp_maze(maze);
             break;
-        case "k_mst":
+        case 'k_mst':
             const bias = (slider.value() / 100);
             console.log(bias);
             k_mst_maze(maze, bias);
             break;
-        case "recur_bt":
+        case 'recur_bt':
             const straightness = (slider.value() + 100) / 200;
             console.log(straightness);
             recur_bt_maze(maze, straightness);
             break;
     }
-    on_window_resize();
-    not_generating = true;
+    refit_scene();
 }
 
-function enable_bot_movement() {
-    bot_may_move = true;
+function watch_on_click() {
+    const x = document.getElementById('main-side-panel');
+    x.setAttribute('style', 'display: none');
+
+    game_mode = GameMode.watch; // Set the game mode to watch: watching the bot run
+    loop();
 }
+document.getElementById('watch').addEventListener('click', watch_on_click);
+
+function play_on_click() {
+    const x = document.getElementById('main-side-panel');
+    x.setAttribute('style', 'display: none');
+
+    game_mode = GameMode.play; // Set the game mode to play: play the game solo
+    loop();
+}
+document.getElementById('play-mode').addEventListener('click', play_on_click);
+
+function race_on_click() {
+    const x = document.getElementById('main-side-panel');
+    x.setAttribute('style', 'display: none');
+
+    game_mode = GameMode.race; // Set the game mode to race: race against the bot
+    loop();
+}
+document.getElementById('race').addEventListener('click', race_on_click);
+
+function return_to_main_on_click() {
+    noLoop();
+    const x = document.getElementById('main-side-panel');
+    x.setAttribute('style', 'display: flex');
+}
+document.getElementById('return-to-main').addEventListener('click', return_to_main_on_click);
 
 function select_bsp_maze() {
-    bot_may_move = false;
     game_running = false;
-    generate_maze("bsp");
-    delete bot;
-    bot = new Bot(maze, "yellow", speed);
-    clearTimeout(bot_reset_timer);
-    bot_reset_timer = setTimeout(enable_bot_movement, bot_reset_timeout);
+    generate_maze('bsp');
+    place_actors();
 }
-document.getElementById("binary-space-partition").addEventListener("click", select_bsp_maze);
+document.getElementById('binary-space-partition').addEventListener('click', select_bsp_maze);
 
 function select_k_mst_maze() {
-    bot_may_move = false;
     game_running = false;
-    generate_maze("k_mst");
-    bot = new Bot(maze, "yellow", speed);
-    clearTimeout(bot_reset_timer);
-    bot_reset_timer = setTimeout(enable_bot_movement, bot_reset_timeout);
+    generate_maze('k_mst');
+    place_actors();
 }
-document.getElementById("kruskals-mst-merge").addEventListener("click", select_k_mst_maze);
+document.getElementById('kruskals-mst-merge').addEventListener('click', select_k_mst_maze);
 
 function select_recur_bt_maze() {
-    bot_may_move = false;
     game_running = false;
-    generate_maze("recur_bt");
-    bot = new Bot(maze, "yellow", speed);
-    clearTimeout(bot_reset_timer);
-    bot_reset_timer = setTimeout(enable_bot_movement, bot_reset_timeout);
+    generate_maze('recur_bt');
+    place_actors();
 }
-document.getElementById("recursive-backtracking").addEventListener("click", select_recur_bt_maze);
+document.getElementById('recursive-backtracking').addEventListener('click', select_recur_bt_maze);
 
 function row_input_update() {
-    const row_input = document.getElementById("rows-input").value;
+    const row_input = document.getElementById('rows-input').value;
     if (!isNaN(row_input)) {
         let row_input_int = parseInt(row_input, 10);
         if (row_input_int < 5)
@@ -124,10 +138,10 @@ function row_input_update() {
         row_count = row_input_int;
     }
 }
-document.getElementById("rows-input").addEventListener("input", row_input_update);
+document.getElementById('rows-input').addEventListener('input', row_input_update);
 
 function col_input_update() {
-    const col_input = document.getElementById("cols-input").value;
+    const col_input = document.getElementById('cols-input').value;
     if (!isNaN(col_input)) {
         let col_input_int = parseInt(col_input, 10);
         if (col_input_int < 5)
@@ -137,10 +151,10 @@ function col_input_update() {
         col_count = col_input_int;
     }
 }
-document.getElementById("cols-input").addEventListener("input", col_input_update);
+document.getElementById('cols-input').addEventListener('input', col_input_update);
 
-function speed_input_update() {
-    const speed_input = document.getElementById("speed-input").value;
+function on_speed_input() {
+    const speed_input = document.getElementById('speed-input').value;
     if (!isNaN(speed_input)) {
         if (speed_input == "")
             return;
@@ -153,66 +167,55 @@ function speed_input_update() {
         bot.notify_speed_update();
     }
 }
-function speed_text_changed() {
-    clearTimeout(speed_input_timer);
-    speed_input_timer = setTimeout(speed_input_update, speed_input_timeout);
-}
-document.getElementById("speed-input").addEventListener("input", speed_text_changed);
+document.getElementById('speed-input').addEventListener('input', on_speed_input);
 
 function play_button_click() {
-    if (not_generating)
-        game_running = true;
+    game_running = true;
 }
-document.getElementById("play-button").addEventListener("click", play_button_click);
-
+document.getElementById('play-button').addEventListener('click', play_button_click);
 
 function pause_button_click() {
     game_running = false;
 }
-document.getElementById("pause-button").addEventListener("click", pause_button_click);
-
+document.getElementById('pause-button').addEventListener('click', pause_button_click);
 
 function reset_button_click() {
     game_running = false;
-    bot_may_move = false; // disable bot movement
     bot.reset();
-    // Timeout before renabling movement
-    clearTimeout(bot_reset_timer);
-    bot_reset_timer = setTimeout(enable_bot_movement, bot_reset_timeout);
 }
-document.getElementById("reset-button").addEventListener("click", reset_button_click);
+document.getElementById('reset-button').addEventListener('click', reset_button_click);
 
 
 function get_shrekt() {
-    x = document.getElementById('site-wrapper-div');
-    x.setAttribute("style", 'background-color: rgb(114,135,0)');
+    let x = document.getElementById('site-wrapper-div');
+    x.setAttribute('style', 'background-color: rgb(114,135,0)');
 
     let options = document.querySelectorAll('[class="options-pane-inner"]');
     options.forEach(
         (elem) => {
-            elem.setAttribute("style", 'background-color: rgb(114,135,0)');
+            elem.setAttribute('style', 'background-color: rgb(114,135,0)');
     });
     
     options = document.querySelectorAll('[class="box-label"]');
     options.forEach(
         (elem) => {
-            elem.setAttribute("style", 'background-color: rgb(191, 213, 160)');
+            elem.setAttribute('style', 'background-color: rgb(191, 213, 160)');
     });
 
     options = document.querySelectorAll('[class="box-label-top"]');
     options.forEach(
         (elem) => {
-            elem.setAttribute("style", 'background-color: rgb(191, 213, 160)');
+            elem.setAttribute('style', 'background-color: rgb(191, 213, 160)');
     });
     
     options = document.querySelectorAll('[class="options-pane-outer"]');
     options.forEach(
         (elem) => {
-            elem.setAttribute("style", 'background-color: rgb(191, 213, 160)');
+            elem.setAttribute('style', 'background-color: rgb(191, 213, 160)');
     });
 
     x = document.getElementById('bottom-right-label');
-    x.setAttribute("style", 'background-color: rgb(191, 213, 160)');
+    x.setAttribute('style', 'background-color: rgb(191, 213, 160)');
 
     document.getElementById('title').innerHTML = "You're in mah swamp now!";
 
@@ -222,10 +225,10 @@ function get_shrekt() {
     
     document.getElementsByClassName('gen-maze-op-row')[6].innerText = "“There he goes. One of God's own prototypes. A high-powered mutant of some kind never even considered for mass production. Too weird to live, and too rare to die.” ― Hunter S. Thompson";
 
-    wall_color = "RGB(35, 142, 35)";
-    background_color = "RGB(85, 92, 70)";
-    trail_color = "#701800";
+    wall_color = 'RGB(35, 142, 35)';
+    background_color = 'RGB(85, 92, 70)';
+    trail_color = 'RGB(112, 24, 0)';
     maze.repaint();
 }
-document.getElementById("dlc").addEventListener("click", get_shrekt);
+document.getElementById('dlc').addEventListener('click', get_shrekt);
 

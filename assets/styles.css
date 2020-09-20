@@ -42,21 +42,20 @@ body {
     width: 100%;
 }
 
-.l-side-button {
+.main-buttons {
     font: small-caps bold 24px/1 sans-serif;
     font-size: 1.3vw;
     text-align: center;
     height: 10%;
-    border: black;
-    border-style: solid;
-    color: black;
-    padding: 1.2vw 1.2vw;
-    margin: 0.2vw 0.2vw;
+    width: 100%;
+    border: 0.3vw solid black;
+    border-left-width: 0;
+    border-right-width: 0;
     position: relative;
     cursor: pointer;
 }
 
-.l-side-button:hover {
+.main-buttons:hover {
     border: rgb(200, 0, 0);
     color: rgb(200, 0, 0);
     border-style: solid;
@@ -67,19 +66,44 @@ body {
     width: 100%;
 }
 
-.main-side-panel {
-    display: none; /* change this to flex when done testing */
-    flex-direction: column;
-    width: 10vw;
+.stacked-panel-holder {
+    width: 23vw;
     height: 49vw;
-    border:5px solid black;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    border: 0.6vw solid black;
     position: relative;
+}
+
+.stacked-panel {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    width: 23vw;
+    height: 49vw;
+    border: 0;
+    left: 0;
+    top: 0;
+}
+
+#main-side-panel {
+    position: absolute;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    width: 23vw;
+    height: 49vw;
+    border: 0;
+    left: 0;
+    top: 0;
+    z-index: 10;
 }
 
 .side-panel {
     display: flex;
     flex-direction: column;
-    width: 20vw;
+    width: 23vw;
     height: 49vw;
     border: 0.6vw solid black;
     position: relative;
@@ -169,8 +193,7 @@ body {
 
 .gen-maze-op-row {
     font: small-caps bold 24px/1 sans-serif;
-    font-size: 1.2vw;
-    float: right;
+    font-size: 1.6vw;
 }
 
 .maze-ctrl-row {
@@ -198,8 +221,8 @@ body {
 .gif-placeholder {
     display:flex;
     width: 100%;
-    height: 23%;
-    background-color: black;
+    height: 24%;
+    background-color: white;
 }
 
 #dlc {
@@ -212,9 +235,10 @@ body {
 }
 
 .maze-alg-button {
+    font-size: 1.2vw;
     border: 0.4vw solid black;
     border-radius: 25%;
-    width: 80%;
+    width: 90%;
     cursor: pointer;
     outline: none;
 }
@@ -229,5 +253,6 @@ body {
 }
 
 .left-text-box{
-    width: fit-content;
+    width: 3vw;
+    font-size: 1.5vw;
 }

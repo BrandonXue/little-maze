@@ -170,33 +170,33 @@ class Maze {
         if ((left_col == -1) && (right_col == 0)) {
             if (val) {
                 for (let segment = start_row; segment <= end_row; ++segment)
-                    this.grid[segment][right_col] |= WallEnum.left;
+                    this.grid[segment][right_col] |= MazeWall.left;
             } else {
                 for (let segment = start_row; segment <= end_row; ++segment)
-                    this.grid[segment][right_col] &= ~WallEnum.left;
+                    this.grid[segment][right_col] &= ~MazeWall.left;
             }
         } 
         // Right perimeter wall
         else if ((left_col == this.col_count-1) && (right_col == this.col_count)) {
             if (val) {
                 for (let segment = start_row; segment <= end_row; ++segment)
-                    this.grid[segment][left_col] |= WallEnum.right;
+                    this.grid[segment][left_col] |= MazeWall.right;
             } else {
                 for (let segment = start_row; segment <= end_row; ++segment)
-                    this.grid[segment][left_col] &= ~WallEnum.right;
+                    this.grid[segment][left_col] &= ~MazeWall.right;
             }
         }
         // Internal wall
         else if ((left_col + 1) == right_col) {
             if (val) {
                 for (let segment = start_row; segment <= end_row; ++segment) {
-                    this.grid[segment][left_col] |= WallEnum.right;
-                    this.grid[segment][right_col] |= WallEnum.left;
+                    this.grid[segment][left_col] |= MazeWall.right;
+                    this.grid[segment][right_col] |= MazeWall.left;
                 }
             } else {
                 for (let segment = start_row; segment <= end_row; ++segment) {
-                    this.grid[segment][left_col] &= ~WallEnum.right;
-                    this.grid[segment][right_col] &= ~WallEnum.left;
+                    this.grid[segment][left_col] &= ~MazeWall.right;
+                    this.grid[segment][right_col] &= ~MazeWall.left;
                 }
             }
         }
@@ -259,33 +259,33 @@ class Maze {
         if ((top_row == -1) && (bot_row == 0)) {
             if (val) {
                 for (let segment = start_col; segment <= end_col; ++segment)
-                    this.grid[bot_row][segment] |= WallEnum.top;
+                    this.grid[bot_row][segment] |= MazeWall.top;
             } else {
                 for (let segment = start_col; segment <= end_col; ++segment)
-                    this.grid[bot_row][segment] &= ~WallEnum.top;
+                    this.grid[bot_row][segment] &= ~MazeWall.top;
             }
         } 
         // Bottom perimeter wall
         else if ((top_row == this.row_count-1) && (bot_row == this.row_count)) {
             if (val) {
                 for (let segment = start_col; segment <= end_col; ++segment)
-                    this.grid[top_row][segment] |= WallEnum.bot;
+                    this.grid[top_row][segment] |= MazeWall.bot;
             } else {
                 for (let segment = start_col; segment <= end_col; ++segment)
-                    this.grid[top_row][segment] &= ~WallEnum.bot;
+                    this.grid[top_row][segment] &= ~MazeWall.bot;
             }
         }
         // Internal wall
         else if ((top_row + 1) == bot_row) {
             if (val) {
                 for (let segment = start_col; segment <= end_col; ++segment) {
-                    this.grid[top_row][segment] |= WallEnum.bot;
-                    this.grid[bot_row][segment] |= WallEnum.top;
+                    this.grid[top_row][segment] |= MazeWall.bot;
+                    this.grid[bot_row][segment] |= MazeWall.top;
                 }
             } else {
                 for (let segment = start_col; segment <= end_col; ++segment) {
-                    this.grid[top_row][segment] &= ~WallEnum.bot;
-                    this.grid[bot_row][segment] &= ~WallEnum.top;
+                    this.grid[top_row][segment] &= ~MazeWall.bot;
+                    this.grid[bot_row][segment] &= ~MazeWall.top;
                 }
             }
         }
@@ -316,7 +316,7 @@ class Maze {
      * @param {Number} col Integer column index.
      */
     has_left_wall(row, col) {
-        return (this.grid[row][col] & WallEnum.left) ? true: false;
+        return (this.grid[row][col] & MazeWall.left) ? true: false;
     }
 
     /**
@@ -325,7 +325,7 @@ class Maze {
      * @param {Number} col Integer column index.
      */
     has_right_wall(row, col) {
-        return (this.grid[row][col] & WallEnum.right) ? true : false;
+        return (this.grid[row][col] & MazeWall.right) ? true : false;
     }
 
     /**
@@ -334,7 +334,7 @@ class Maze {
      * @param {Number} col Integer column index.
      */
     has_top_wall(row, col) {
-        return (this.grid[row][col] & WallEnum.top) ? true : false;
+        return (this.grid[row][col] & MazeWall.top) ? true : false;
     }
 
     /**
@@ -343,7 +343,7 @@ class Maze {
      * @param {Number} col Integer column index.
      */
     has_bot_wall(row, col) {
-        return (this.grid[row][col] & WallEnum.bot) ? true : false;
+        return (this.grid[row][col] & MazeWall.bot) ? true : false;
     }
 
     is_end_position(row, col) {
@@ -376,13 +376,13 @@ function create_ent_ext(maze) {
             maze.start_col = 0;
             maze.end_row = h2;
             maze.end_col = maze.col_count-1;
-            maze.start_dir = BotDirEnum.right;
+            maze.start_dir = ActorDirection.right;
         } else { // Entrance right, exit left
             maze.start_row = h2;
             maze.start_col = maze.col_count-1;
             maze.end_row = h1;
             maze.end_col = 0;
-            maze.start_dir = BotDirEnum.left;
+            maze.start_dir = ActorDirection.left;
         }
         maze.vertical_wall(-1, 0, h1, h1, false); // Left
         maze.vertical_wall(maze.col_count-1, maze.col_count, h2, h2, false); // Right
@@ -394,13 +394,13 @@ function create_ent_ext(maze) {
             maze.start_col = h1;
             maze.end_row = maze.row_count-1;
             maze.end_col = h2;
-            maze.start_dir = BotDirEnum.down;
+            maze.start_dir = ActorDirection.down;
         } else { // entrance bot, exit top
             maze.start_row = maze.row_count-1;
             maze.start_col = h2;
             maze.end_row = 0;
             maze.end_col = h1;
-            maze.start_dir = BotDirEnum.up;
+            maze.start_dir = ActorDirection.up;
         }
         maze.horizontal_wall(h1, h1, -1, 0, false);  // Top
         maze.horizontal_wall(h2, h2, maze.row_count-1, maze.row_count, false);  // Bot
@@ -421,7 +421,7 @@ function bsp_maze(maze) {
     create_ent_ext(maze);
     /** Create internal walls via recursive partition **/
     // Use a random starting direction for the initial partition
-    const random_dir = random() >= 0.5 ? DirectionEnum.horizontal : DirectionEnum.vertical;
+    const random_dir = random() >= 0.5 ? MazeWall.horizontal : MazeWall.vertical;
     binary_space_partition(0, maze.col_count-1, 0, maze.row_count-1, 0.5, random_dir, maze);
 }
 
@@ -431,7 +431,7 @@ function bsp_maze(maze) {
  * @param {Number} right_col The right column index of the current partition.
  * @param {Number} top_row The top row index of the current partition.
  * @param {Number} bot_row The bottom row index of the current partition.
- * @param {DirectionEnum} dir Used to keep track of the parent partition's splitting orientation.
+ * @param {TwoBitDirection} dir Used to keep track of the parent partition's splitting orientation.
  * @param {Maze} maze A reference to the maze object to be modified
  */
 function binary_space_partition(left_col, right_col, top_row, bot_row, hole_pref, dir, maze) {
@@ -444,9 +444,9 @@ function binary_space_partition(left_col, right_col, top_row, bot_row, hole_pref
 
     let wall_dir; // The orientation of the new wall to be generated (vertical or horizontal?)
     if (d_width == 0) // If width is 0, we cannot create a vertical wall, so it must be horizontal
-        wall_dir = DirectionEnum.horizontal;
+        wall_dir = MazeWall.horizontal;
     else if (d_height == 0) // Else if height is 0, we cannot create a horizontal wall, so it must be vertical
-        wall_dir = DirectionEnum.vertical;
+        wall_dir = MazeWall.vertical;
     else { // Else we can partition in either direction
         // Bias towards keeping the partition square
         let cutoff = (d_height / (d_height + d_width)); // cutoff higher if area = tall, lower if area = wide
@@ -456,14 +456,14 @@ function binary_space_partition(left_col, right_col, top_row, bot_row, hole_pref
         } else if (cutoff < 0.5 && d_width < 6) {
             cutoff = 0.65;
         }
-        wall_dir = random() >= cutoff ? DirectionEnum.vertical : DirectionEnum.horizontal;
+        wall_dir = random() >= cutoff ? MazeWall.vertical : MazeWall.horizontal;
     }
 
     // If parent partition was in a different direction, reset hole pref
     if (dir != wall_dir)
         hole_pref = 0.5;
 
-    if (wall_dir == DirectionEnum.horizontal) { // horizontal wall
+    if (wall_dir == MazeWall.horizontal) { // horizontal wall
         // Choose the wall and hole
         const wall_choice = floor(clt_random() * d_height) + top_row; // The row just above the proposed wall
         let hole_choice;
@@ -651,13 +651,13 @@ function recur_bt_maze(maze, straightness) {
         const valid = new Array();
         // Make sure not to include perimeter walls
         if ( (front_col > 0) && !visited_set.contains(front_index - 1) )
-            valid.push(DirectionEnum.left);
+            valid.push(TwoBitDirection.left);
         if ( (front_col < (maze.col_count-1)) && !visited_set.contains(front_index + 1) )
-            valid.push(DirectionEnum.right);
+            valid.push(TwoBitDirection.right);
         if ( (front_row > 0) && !visited_set.contains(front_index - maze.col_count) )
-            valid.push(DirectionEnum.up);
+            valid.push(TwoBitDirection.up);
         if ( (front_row < (maze.row_count-1)) && !visited_set.contains(front_index + maze.col_count) )
-            valid.push(DirectionEnum.down);
+            valid.push(TwoBitDirection.down);
         // If there are no valid directions, pop from stack
         if (valid.length == 0) {
             --count;
@@ -689,24 +689,24 @@ function recur_bt_maze(maze, straightness) {
 
             // Go in the first direction in our valid array
             switch (valid[0]) {
-                case DirectionEnum.left:
+                case TwoBitDirection.left:
                     maze.vertical_wall(front_col-1, front_col, front_row, front_row, false);
-                    path_stack[count-1] |= DirectionEnum.left; // Set direction travelled as left
+                    path_stack[count-1] |= TwoBitDirection.left; // Set direction travelled as left
                     new_cell = front_index - 1; // Find the index of the cell to the left of current
                     break;
-                case DirectionEnum.right:
+                case TwoBitDirection.right:
                     maze.vertical_wall(front_col, front_col+1, front_row, front_row, false);
-                    path_stack[count-1] |= DirectionEnum.right; // Set direction travelled as right
+                    path_stack[count-1] |= TwoBitDirection.right; // Set direction travelled as right
                     new_cell = front_index + 1; // Find the index of the cell to the right of current
                     break;
-                case DirectionEnum.up:
+                case TwoBitDirection.up:
                     maze.horizontal_wall(front_col, front_col, front_row-1, front_row, false);
-                    path_stack[count-1] |= DirectionEnum.up; // Set direction travelled as up
+                    path_stack[count-1] |= TwoBitDirection.up; // Set direction travelled as up
                     new_cell = front_index - maze.col_count; // Find the index of the cell above current
                     break;
-                case DirectionEnum.down:
+                case TwoBitDirection.down:
                     maze.horizontal_wall(front_col, front_col, front_row, front_row+1, false);
-                    path_stack[count-1] |= DirectionEnum.down; // Set direction travelled as down
+                    path_stack[count-1] |= TwoBitDirection.down; // Set direction travelled as down
                     new_cell = front_index + maze.col_count; // Find the index of the cell below current
                     break;
             }

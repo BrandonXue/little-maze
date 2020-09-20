@@ -2,10 +2,10 @@
 <html lang="">    <!-- HTML page begs/ends w 'html' tag -->
   <head>    <!-- HTML page has 'head'section and 'body' section -->
     <meta charset="utf-8">
-    <meta foo="Time-stamp: 2020-09-014 BrandonX, ErnestoH, RyanM>">
+    <meta foo="Time-stamp: 2020-09-019 BrandonX, ErnestoH, RyanM>">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>P5-JS-HTML</title>     <!-- Browser or tab title -->
+    <title>Little Maze</title>     <!-- Browser or tab title -->
     <link rel="stylesheet" href="assets/styles.css">
 
     <!-- For more P5.JS, CF https://github.com/processing/p5.js/wiki -->
@@ -20,57 +20,59 @@
     <div id="site-wrapper-div" class="site-wrapper">
       <h1 id="title">Little Maze</h1>    <!-- Text in a high priority heading -->
       <div class ="parent">
-        <div class="main-side-panel">
-          <button id="watch" class="l-side-button">Watch</button>
-          <div class="gif-placeholder"></div> 
-          <button id="play-mode"  class="l-side-button">Play</button>
-          <div class="gif-placeholder"></div>
-          <button id="race"  class="l-side-button">Race</button>
-          <div class="gif-placeholder"></div>
-        </div>
-        <div class="side-panel">
-          <div class="box-label-top">Generate Maze</div>
-          <div class="options-pane-outer">
-            <div class="options-pane-inner">
-              <button id="binary-space-partition" class="maze-alg-button">Binary Space Partition</button>
-              <button id="kruskals-mst-merge" class="maze-alg-button">Kruskal's MST Merge</button>
-              <button id="recursive-backtracking" class="maze-alg-button">Recursive Backtracking</button>
-            </div>
+        <div class="stacked-panel-holder">
+          <div id="main-side-panel">
+            <button id="watch" class="main-buttons">Watch</button>
+            <div class="gif-placeholder"></div> 
+            <button id="play-mode"  class="main-buttons">Play</button>
+            <div class="gif-placeholder"></div>
+            <button id="race"  class="main-buttons">Race</button>
+            <div class="gif-placeholder"></div>
           </div>
-          <div class="box-label">Maze Options</div>
-          <div class="options-pane-outer">
-            <div class="options-pane-inner">
-              <div class="gen-maze-op-row">
-                Rows:
-                <input type="text" id="rows-input" class="left-text-box" value="40">
-              </div>
-              <div class="gen-maze-op-row">
-                Columns:
-                <input type="text" id="cols-input" class="left-text-box" value="40">
-              </div>
-              <div class="gen-maze-op-row">
-                Speed:
-                <input type="text" id="speed-input" class="left-text-box" value="5">
+          <div class="stacked-panel">
+            <div class="box-label-top">Generate Maze</div>
+            <div class="options-pane-outer">
+              <div class="options-pane-inner">
+                <button id="binary-space-partition" class="maze-alg-button">Binary Space Partition</button>
+                <button id="kruskals-mst-merge" class="maze-alg-button">Kruskal's MST Merge</button>
+                <button id="recursive-backtracking" class="maze-alg-button">Recursive Backtracking</button>
               </div>
             </div>
-          </div>
-          <div class="box-label">Maze Controls</div>
-          <div class="options-pane-outer">
-            <div class="options-pane-inner">
-              <div class ="maze-ctrl-row">
-                <button id="play-button" class="ctrl-button">
-                  <img id="play" class="button-inner" src="assets/play-button.svg" alt="">
-                </button>
-                <button id="pause-button" class="ctrl-button">
-                  <img id="play" class="button-inner" src="assets/pause-button.svg" alt="">
-                </button>
-                <button id="reset-button" class="ctrl-button">
-                  <img id="play" class="button-inner" src="assets/reset.svg" alt="">
-                </button>
+            <div class="box-label">Maze Options</div>
+            <div class="options-pane-outer">
+              <div class="options-pane-inner">
+                <div class="gen-maze-op-row">
+                  Rows:
+                  <input type="text" id="rows-input" class="left-text-box" value="40">
+                </div>
+                <div class="gen-maze-op-row">
+                  Columns:
+                  <input type="text" id="cols-input" class="left-text-box" value="40">
+                </div>
+                <div class="gen-maze-op-row">
+                  Speed:
+                  <input type="text" id="speed-input" class="left-text-box" value="5">
+                </div>
               </div>
             </div>
+            <div class="box-label">Maze Controls</div>
+            <div class="options-pane-outer">
+              <div class="options-pane-inner">
+                <div class ="maze-ctrl-row">
+                  <button id="play-button" class="ctrl-button">
+                    <img id="play" class="button-inner" src="assets/play-button.svg" alt="">
+                  </button>
+                  <button id="pause-button" class="ctrl-button">
+                    <img id="play" class="button-inner" src="assets/pause-button.svg" alt="">
+                  </button>
+                  <button id="reset-button" class="ctrl-button">
+                    <img id="play" class="button-inner" src="assets/reset.svg" alt="">
+                  </button>
+                </div>
+              </div>
+            </div>
+            <button id="return-to-main">Return to Main Menu</button>
           </div>
-          <button id="return-to-main">Return to Main Menu</button>
         </div>
 
         <div id="canvas-div"> </div> <!-- Our p5 canvas goes inside this div -->
@@ -94,13 +96,13 @@
           <div class="options-pane-outer">
             <div class="options-pane-inner">
               <div class="gen-maze-op-row">
-                Rows: Valid Inputs (5-100)
+                Rows: 5 to 100
               </div>
               <div class="gen-maze-op-row">
-                Columns: Valid Inputs (5-100)
+                Columns: 5 to 100
               </div>
               <div class="gen-maze-op-row">
-                Speed: Valid Inputs (1-8)
+                Speed: 1 to 8
               </div>
             </div>
           </div>
