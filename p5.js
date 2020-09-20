@@ -51920,6 +51920,7 @@
           };
 
           _main.default.Renderer2D.prototype._setFill = function(fillStyle) {
+              //console.log(fillStyle, this._cachedFillStyle);
             if (fillStyle !== this._cachedFillStyle) {
               this.drawingContext.fillStyle = fillStyle;
               this._cachedFillStyle = fillStyle;

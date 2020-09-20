@@ -147,7 +147,6 @@ class Bot {
         for (let i = 0; i < this.trail.get_count(); ++i) {
             const col = stack[i] % this.maze.col_count;
             const row = floor(stack[i] / this.maze.col_count);
-            //console.log(row, col);
             const x = (col * this.maze.unit_area) + this.maze.offset + (0.5 * this.maze.unit_area);
             const y = (row * this.maze.unit_area) + this.maze.offset + (0.5 * this.maze.unit_area);
             stroke(trail_color);
@@ -178,8 +177,8 @@ class Bot {
     draw_bot() {
         const x = (this.col * this.maze.unit_area) + this.maze.offset + (0.5 * this.maze.unit_area);
         const y = (this.row * this.maze.unit_area) + this.maze.offset + (0.5 * this.maze.unit_area);
-        //stroke("clear"); // workaround for p5 bug where color doesn't change
-        //fill("clear"); // unless it is set to something different
+        stroke("clear"); // workaround for p5 bug where color doesn't change
+        fill("clear"); // unless it is set to something different
         strokeWeight(0.05 * this.maze.unit_area);
         stroke("orange");
         fill(this.color);

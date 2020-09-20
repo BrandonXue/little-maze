@@ -37,12 +37,12 @@ window.addEventListener('resize', function() { // Whenever window resizes
 
 
 function play() {
-    console.log("test menu");
+    console.log("play pressed");
 }
 document.getElementById("play-mode").addEventListener("click", play);
 
 function watch() {
-    console.log("icles");
+    console.log("watch pressed");
 }
 document.getElementById("watch").addEventListener("click", watch);
 
@@ -57,6 +57,7 @@ function generate_maze(maze_algorithm) {
     const unit_area = window.innerWidth * 0.5 / col_count;
     // Create a new maze object. This makes sure there is no garbage data in the path bits
     // of the grid from the previous run.
+
     maze = new Maze(row_count, col_count, unit_area, wall_color, background_color);
     switch (maze_algorithm) {
         case "bsp":
@@ -149,7 +150,6 @@ function speed_input_update() {
     }
 }
 function speed_text_changed() {
-    //console.log("using debounce")
     clearTimeout(speed_input_timer);
     speed_input_timer = setTimeout(speed_input_update, speed_input_timeout);
 }
@@ -180,7 +180,6 @@ document.getElementById("reset-button").addEventListener("click", reset_button_c
 
 
 function get_shrekt() {
-    console.log("You're in mah swamp now.")
     x = document.getElementById('site-wrapper-div');
     x.setAttribute("style", 'background-color: rgb(114,135,0)');
 
@@ -223,29 +222,5 @@ function get_shrekt() {
     background_color = "RGB(85, 92, 70)";
     trail_color = "#701800";
     maze.repaint();
-    //document.getElementById('bottom-right-label').setAttribute("style", 'background-color: white');
-
-    //const option_panes = document.getElementsByClassName('options-pane-inner');
-    
-    /*option_panes.s
-    for (let i = 0; i < option_panes.length; ++i) {
-        s = option_panes[i];
-        s.setAttribute("style", 'background-color: rgb(114,135,0)');
-    }*/
-    //.style.background_color = "Lime";
-    //document.getElementsByClassName('site-wrapper')[0].style.background_color = "Lime";
-    // var x;
-    // try{
-    //     x = document.getElementById('site-wrapper-div');
-    //    //x = document.querySelector('[class = "site-wrapper"]');
-    //     x.setAttribute("style", 'background-color: lime');
-    //    //x = document.getElementById('site-wrapper-div');
-    //    //x.className = "site-wrapper-update";
-    //    //console.log(x);
-    // }
-    // catch{
-    //     console.log("doesnt work");
-    // }
-
 }
 document.getElementById("dlc").addEventListener("click", get_shrekt);

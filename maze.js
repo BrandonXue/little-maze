@@ -37,18 +37,6 @@ class Maze {
         this.grid = Array(this.row_count);
         for (let row = 0; row < this.row_count; ++row)
             this.grid[row] = new Uint8Array(this.col_count);
-
-        this.fill_background();
-    }
-
-    /**
-     * Fills the maze grid area with the background color specified by this.fill_color
-     */
-    fill_background() {
-        const width = (this.col_count * this.unit_area) + this.wall_thickness;
-        const height = (this.row_count * this.unit_area) + this.wall_thickness;
-        maze_buff.fill(this.fill_color);
-        maze_buff.background(this.fill_color);
     }
 
 
@@ -70,7 +58,8 @@ class Maze {
         this.fill_color = background_color;
         this.wall_color = wall_color;
         maze_buff.strokeCap(SQUARE);
-        this.fill_background();
+        maze_buff.background(this.fill_color);
+
         // Go over all cells in the grid and repaint their left and top walls
         for (let row = 0; row < this.row_count; ++row) {
             for (let col = 0; col < this.col_count; ++col) {
