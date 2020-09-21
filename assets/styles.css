@@ -178,8 +178,7 @@ body {
 }
 
 #bottom-right-label {
-    font: small-caps bold 24px/1 sans-serif;
-    font-size: 1.7vw;
+    font: small-caps bold 1.7vw sans-serif;
     text-align: center;
     border-top: 0.3vw solid black;
     width: 100%;
@@ -202,8 +201,7 @@ body {
 }
 
 .options-pane-inner {
-    font: small-caps bold 24px/1 sans-serif;
-    font-size: 1.2vw;
+    font: small-caps bold 1.2vw sans-serif;
     width: 90%;
     height: 100%;
     border-left: 0.4vw solid black;
@@ -215,8 +213,11 @@ body {
 }
 
 .gen-maze-op-row {
-    font: small-caps bold 24px/1 sans-serif;
-    font-size: 1.6vw;
+    font: small-caps bold 1.6vw sans-serif;
+}
+
+#hint-text {
+    font: small-caps bold 1.6vw sans-serif;
 }
 
 .maze-ctrl-row {
