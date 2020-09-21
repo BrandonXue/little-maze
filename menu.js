@@ -259,7 +259,10 @@ function get_shrekt() {
     document.getElementsByClassName('box-label')[3].innerText = "Hey now,";
 
     
-    document.getElementsByClassName('gen-maze-op-row')[6].innerText = "“There he goes. One of God's own prototypes. A high-powered mutant of some kind never even considered for mass production. Too weird to live, and too rare to die.” ― Hunter S. Thompson";
+    document.getElementsByClassName('gen-maze-op-row')[6].innerText =
+        "“There he goes. One of God's own prototypes." +
+        " A high-powered mutant of some kind never even considered for mass production." +
+        " Too weird to live, and too rare to die.” ― Hunter S. Thompson";
 
     wall_color = 'RGB(35, 142, 35)';
     background_color = 'RGB(85, 92, 70)';
@@ -267,4 +270,3 @@ function get_shrekt() {
     maze.repaint();
 }
 document.getElementById('dlc').addEventListener('click', get_shrekt);
-

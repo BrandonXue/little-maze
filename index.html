@@ -1,18 +1,18 @@
 <!--
 Brandon Xue          brandonx@csu.fullerton.edu
- Ernesto Hoogkkirk    Ernesto_Hooghkirk@csu.fullerton.edu
- Ryan Martinez        rmartinez72@csu.fullerton.edu
+Ernesto Hoogkkirk    Ernesto_Hooghkirk@csu.fullerton.edu
+Ryan Martinez        rmartinez72@csu.fullerton.edu
  
- Last maintained (YYMMDD): 200920
+Last maintained (YYMMDD): 200920
  
- The html page for our little maze game. This file loads all the necessary
- scripts for the maze game in the correct order. The menu script must be
- loaded after all the referenced elements are created.
+The html page for our little maze game. This file loads all the necessary
+scripts for the maze game in the correct order. The menu script must be
+loaded after all the referenced elements are created.
 
- The web page consists of a maze game at the center of the screen, and two
- side panels flanking it. Both side panels host some game controls and
- information tidbits. The main menu can also be accessed from the left side,
- where the game-mode can be changed.
+The web page consists of a maze game at the center of the screen, and two
+side panels flanking it. Both side panels host some game controls and
+information tidbits. The main menu can also be accessed from the left side,
+where the game-mode can be changed.
 -->
 
 <!DOCTYPE html>
@@ -48,11 +48,17 @@ Brandon Xue          brandonx@csu.fullerton.edu
           <!-- Main menu panel appears overlapping on top of left side panel-->
           <div id="main-side-panel">
             <button id="watch" class="main-buttons">Watch</button>
-            <div class="gif-placeholder"></div> 
+            <div class="gif-box">
+              <img  src="assets/watch2.gif"> <!-- Watch menu gif -->
+            </div> 
             <button id="play-mode"  class="main-buttons">Play</button>
-            <div class="gif-placeholder"></div>
+            <div class="gif-box">
+              <img class="menu-gif" src="assets/play2.gif"> <!-- Play menu gif -->
+            </div>
             <button id="race"  class="main-buttons">Race</button>
-            <div class="gif-placeholder"></div>
+            <div class="gif-box">
+              <img class="menu-gif" src="assets/race2.gif"> <!-- Race menu gif -->
+            </div>
           </div>
 
           <!-- Left side panel-->
