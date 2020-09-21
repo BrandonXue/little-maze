@@ -256,8 +256,6 @@ function get_shrekt() {
             elem.setAttribute('style', 'background-color: rgb(191, 213, 160)');
     });
 
-
-    //document.getElementById('return-to-main').setAttribute('style', 'background-color: rgb(191, 213, 160)');
     document.getElementById('return-to-main').setAttribute('class', 'return-main-shrek');
 
     x = document.getElementById('bottom-right-label');
