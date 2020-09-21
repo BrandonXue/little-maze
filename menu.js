@@ -10,7 +10,7 @@
  * 
  * There is also a function for a little (not so little) easter egg.
  */
-
+/*jshint esversion: 6 */
 
 
 const window_resize_timeout = 500; // Delay for debouncing window resize events
@@ -250,15 +250,25 @@ function get_shrekt() {
             elem.setAttribute('style', 'background-color: rgb(191, 213, 160)');
     });
 
+    options = document.querySelectorAll('[class="main-buttons"]');
+    options.forEach(
+        (elem) => {
+            elem.setAttribute('style', 'background-color: rgb(191, 213, 160)');
+    });
+
+
+    //document.getElementById('return-to-main').setAttribute('style', 'background-color: rgb(191, 213, 160)');
+    document.getElementById('return-to-main').setAttribute('class', 'return-main-shrek');
+
     x = document.getElementById('bottom-right-label');
     x.setAttribute('style', 'background-color: rgb(191, 213, 160)');
 
     document.getElementById('title').innerHTML = "You're in mah swamp now!";
 
     document.getElementById('bottom-right-label').innerText = "..you're an all star.";
-    document.getElementsByClassName('box-label')[3].innerText = "Hey now,";
+    document.getElementById('hint-label').innerText = "Hey now,";
 
-    document.getElementsByClassName('gen-maze-op-row')[6].innerText =
+    document.getElementById('hint-text').innerText =
         "“There he goes. One of God's own prototypes." +
         " A high-powered mutant of some kind never even considered for mass production." +
         " Too weird to live, and too rare to die.” ― Hunter S. Thompson";
@@ -267,5 +277,6 @@ function get_shrekt() {
     background_color = 'RGB(85, 92, 70)';
     trail_color = 'RGB(112, 24, 0)';
     maze.repaint();
+    redraw();
 }
 document.getElementById('dlc').addEventListener('click', get_shrekt);

@@ -10,6 +10,8 @@
  * to take a Maze object and modify its grid using Maze methods.
  */
 
+ /*jshint esversion: 6 */
+
 class Maze {
     /**
      * @param {Number} rows Integer. Number of rows in matrix.
@@ -635,7 +637,7 @@ function recur_bt_maze(maze, straightness) {
     let unexplored = total_cells; // Keep track of number of unexplored cells
     let count = 0; // Keep track of number of elements in the stack
 
-    const first = rand_int(0, total_cells-1) // A random cell to be added into the path stack
+    const first = rand_int(0, total_cells-1); // A random cell to be added into the path stack
     const first_row = floor(first / maze.col_count);
     const first_col = first % maze.col_count;
     visited_set.insert(first);
@@ -648,7 +650,7 @@ function recur_bt_maze(maze, straightness) {
                                                        // make sure using 0 fill right shift
         const front_row = floor(front_index / maze.col_count);
         const front_col = front_index % maze.col_count;
-        const valid = new Array();
+        const valid = [];
         // Make sure not to include perimeter walls
         if ( (front_col > 0) && !visited_set.contains(front_index - 1) )
             valid.push(TwoBitDirection.left);

@@ -54,8 +54,7 @@ body {
 }
 
 .main-buttons {
-    font: small-caps bold 24px/1 sans-serif;
-    font-size: 1.3vw;
+    font: small-caps bold 3vw sans-serif;
     text-align: center;
     height: 10%;
     width: 100%;
@@ -134,8 +133,7 @@ body {
 }
 
 .box-label-top {
-    font: small-caps bold 24px/1 sans-serif;
-    font-size: 1.7vw;
+    font: small-caps bold 1.7vw sans-serif;
     text-align: center;
     border-bottom: 0.6vw solid black;
     background-color: white;
@@ -148,8 +146,7 @@ body {
 }
 
 .box-label {
-    font: small-caps bold 24px/1 sans-serif;
-    font-size: 1.7vw;
+    font: small-caps bold 1.7vw sans-serif;
     text-align: center;
     border-top: 0.6vw solid black;
     border-bottom: 0.6vw solid black;
@@ -162,9 +159,12 @@ body {
     padding: 0px;
 }
 
+.return-main-shrek {
+    background-color: rgb(191, 213, 160);
+}
+
 #return-to-main {
-    font: small-caps bold 24px/1 sans-serif;
-    font-size: 1.2vw;
+    font: small-caps bold 1.5vw sans-serif;
     text-align: center;
     border: 0 solid black;
     border-top: 0.3vw solid black;
@@ -217,7 +217,7 @@ body {
 }
 
 #hint-text {
-    font: small-caps bold 1.6vw sans-serif;
+    font: small-caps bold 1.2vw sans-serif;
 }
 
 .maze-ctrl-row {

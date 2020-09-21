@@ -15,7 +15,7 @@
  * different visual components of our program. The maze is redrawn to the
  * scene in every frame, and other actors and components are drawn next.
  */
-
+/*jshint esversion: 6 */
 
 
  /**
